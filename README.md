@@ -5,7 +5,10 @@ conformado en honor a los Axiomas de Zermelo-Frankel🧠, y como proveen una fun
 
 ## Integrantes
 
-:compass:Juan Jerónimo Gómez Rubiano
-💪Alan Ryan Cheyne Gómez
-:dog:David Santiago Velásquez Gómez
-:coffee:Cristian Leonardo Castañeda Olarte
+:compass:**Juan Jerónimo Gómez Rubiano**
+
+💪**Alan Ryan Cheyne Gómez**
+
+:dog:**David Santiago Velásquez Gómez**
+
+:coffee:**Cristian Leonardo Castañeda Olarte**
