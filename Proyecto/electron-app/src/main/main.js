@@ -1,13 +1,20 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
-const path = require('path');
-const db = require('./db');
+import { app, BrowserWindow, ipcMain } from 'electron';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import db from './db/index.js';
+
+// Get __dirname equivalent in ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 function createWindow() {
   const win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1400,
+    height: 900,
     webPreferences: {
       preload: path.join(__dirname, '../preload/preload.js'),
+      nodeIntegration: false,
+      contextIsolation: true,
     },
   });
 
@@ -20,10 +27,61 @@ function createWindow() {
 
 app.whenReady().then(createWindow);
 
-console.log('Funcionaaa');
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
+});
 
-// Ejemplo de canal IPC
+app.on('activate', () => {
+  if (BrowserWindow.getAllWindows().length === 0) {
+    createWindow();
+  }
+});
+
+console.log('ZFCocteles iniciado correctamente 🥂');
+
+// Canales IPC para gestión de cócteles
 ipcMain.on('guardar-coctel', (event, coctel) => {
-  db.guardarCoctel(coctel);
-  event.reply('guardar-coctel-respuesta', { success: true });
+  try {
+    const id = db.guardarCoctel(coctel);
+    event.reply('guardar-coctel-respuesta', { success: true, id });
+  } catch (error) {
+    event.reply('guardar-coctel-respuesta', { success: false, error: error.message });
+  }
+});
+
+ipcMain.handle('obtener-cocteles', async () => {
+  try {
+    return { success: true, data: db.obtenerTodosCocteles() };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('obtener-coctel', async (event, id) => {
+  try {
+    const coctel = db.obtenerCoctelPorId(id);
+    return { success: true, data: coctel };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('buscar-cocteles', async (event, nombre) => {
+  try {
+    const cocteles = db.buscarCoctelesPorNombre(nombre);
+    return { success: true, data: cocteles };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('obtener-estadisticas', async () => {
+  try {
+    const stats = db.obtenerEstadisticas();
+    return { success: true, data: stats };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
 });

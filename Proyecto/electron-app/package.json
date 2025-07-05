@@ -2,14 +2,19 @@
   "name": "zfcocteles",
   "private": true,
   "version": "1.0.0",
-  "type": "commonjs",
+  "description": "Una aplicación Electron + React + Vite donde podrás encontrar y gestionar recetas cócteles.",
+  "author": "ZFCfans Team",
+  "type": "module",
   "main": "src/main/main.js",
   "scripts": {
+    "setup": "npm install && npm run rebuild-sqlite",
     "dev": "concurrently \"vite\" \"cross-env NODE_ENV=development npx electron .\"",
-    "build:renderer": "vite build",
     "build": "npm run build:renderer && electron-builder",
+    "build:renderer": "vite build",
     "test": "vitest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "rebuild-sqlite": "electron-rebuild -f -w better-sqlite3",
+    "postinstall": "npm run rebuild-sqlite"
   },
   "dependencies": {
     "better-sqlite3": "^12.2.0",
