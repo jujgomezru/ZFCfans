@@ -2,7 +2,7 @@ import db from './database.js';
 
 export default {
   // Crear un nuevo cóctel
-  guardarCoctel: (coctel) => {
+  guardarCoctel: coctel => {
     const stmt = db.prepare(`
       INSERT INTO cocteles (
         nombre, descripcion, ingredientes, instrucciones,
@@ -18,7 +18,7 @@ export default {
       coctel.categoria || null,
       coctel.dificultad || null,
       coctel.tiempo_preparacion || null,
-      coctel.imagen_url || null
+      coctel.imagen_url || null,
     );
 
     return result.lastInsertRowid;
@@ -30,14 +30,14 @@ export default {
     const cocteles = stmt.all();
 
     // Parsear ingredientes de JSON
-    return cocteles.map((coctel) => ({
+    return cocteles.map(coctel => ({
       ...coctel,
       ingredientes: JSON.parse(coctel.ingredientes),
     }));
   },
 
   // Obtener cóctel por ID
-  obtenerCoctelPorId: (id) => {
+  obtenerCoctelPorId: id => {
     const stmt = db.prepare('SELECT * FROM cocteles WHERE id = ?');
     const coctel = stmt.get(id);
 
@@ -49,22 +49,22 @@ export default {
   },
 
   // Buscar cócteles por nombre
-  buscarCoctelesPorNombre: (nombre) => {
+  buscarCoctelesPorNombre: nombre => {
     const stmt = db.prepare('SELECT * FROM cocteles WHERE nombre LIKE ? ORDER BY nombre');
     const cocteles = stmt.all(`%${nombre}%`);
 
-    return cocteles.map((coctel) => ({
+    return cocteles.map(coctel => ({
       ...coctel,
       ingredientes: JSON.parse(coctel.ingredientes),
     }));
   },
 
   // Filtrar por categoría
-  obtenerCoctelesPorCategoria: (categoria) => {
+  obtenerCoctelesPorCategoria: categoria => {
     const stmt = db.prepare('SELECT * FROM cocteles WHERE categoria = ? ORDER BY nombre');
     const cocteles = stmt.all(categoria);
 
-    return cocteles.map((coctel) => ({
+    return cocteles.map(coctel => ({
       ...coctel,
       ingredientes: JSON.parse(coctel.ingredientes),
     }));
@@ -89,14 +89,14 @@ export default {
       coctel.dificultad || null,
       coctel.tiempo_preparacion || null,
       coctel.imagen_url || null,
-      id
+      id,
     );
 
     return result.changes > 0;
   },
 
   // Eliminar cóctel
-  eliminarCoctel: (id) => {
+  eliminarCoctel: id => {
     const stmt = db.prepare('DELETE FROM cocteles WHERE id = ?');
     const result = stmt.run(id);
     return result.changes > 0;

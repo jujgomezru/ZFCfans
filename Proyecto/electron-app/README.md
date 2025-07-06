@@ -8,6 +8,7 @@ El proyecto sigue una arquitectura **monolítica**, basada en los patrones de di
 ## 🚀 Configuración Inicial
 
 > ✅ **Requisitos:** Node.js v20.x
+
 > 💡 **Recomendado:** Usar nvm para manejar versiones de Node.js
 
 ### 1. Clonar el repositorio
@@ -49,11 +50,17 @@ npm run setup
 # 🚀 Ejecuta la app en modo desarrollo (Electron + Vite)
 npm run dev
 
-# 📦 Compila el frontend + backend y empaqueta la app con electron-builder
+# 📦 Compila todo y crea instalador (Windows: .exe, macOS: .dmg)
 npm run build
 
 # 📦 Compila el frontend con Vite
 npm run build:renderer
+
+# Compila y empaqueta sin crear instalador (más rápido para pruebas)
+npm run pack
+
+# Compila y crea instalador sin subirlo (para distribución local)
+npm run dist
 
 # 🧪 Ejecuta los tests con Vitest
 npm run test
@@ -61,10 +68,22 @@ npm run test
 # 📏 Ejecuta ESLint para revisar estilo, errores y convenciones
 npm run lint
 
+# 🛠 Corrige automáticamente problemas de estilo y convenciones con ESLint
+npm run lint:fix
+
+# 🎨 Formatea el código con Prettier
+npm run format
+
+# ✅ Verifica el formato del código con Prettier
+npm run format:check
+
+# 📊 Ejecuta pruebas de calidad de código (formato + lint + tests)
+npm run code-quality
+
 # 🛠 Recompila better-sqlite3 para Electron (puede usarse manualmente)
 npm run rebuild-sqlite
 
-# ⚙️ Script automático posterior a cada instalación (no se ejecuta manualmente)
+# ⚙️ Instala dependencias de Electron y recompila native modules
 npm run postinstall
 
 ```
@@ -76,20 +95,27 @@ ZFCFANS/
 ├── .vscode/                     # Configuración del entorno de desarrollo.
 ├── ...
   electron-app/
+  ├── docs                         # Documentación del proyecto
   ├── public/                      # Archivos estáticos opcionales
   ├── src/
   │   ├── main/                    # Proceso principal de Electron
   │   │   ├── db/                  # Conexión y lógica de la base de datos (SQLite)
+  │   │   ├── tests /              # Pruebas unitarias del proceso principal
   │   │   └── main.js              # Entrada principal (ESM)
   │   ├── preload/                 # Preload scripts (IPC seguro)
   │   └── renderer/                # Aplicación React (Vista + lógica)
+  │       ├── assets/              # Recursos estáticos (imágenes, estilos, etc.)
   │       ├── builders/            # Builders para construir entidades
   │       ├── components/          # Componentes React (Vista)
+  │       ├── contexts/            # Contextos de React (Estado global)
   │       ├── controllers/         # Controladores (MVC)
+  │       ├── hooks/               # Hooks personalizados de React
   │       ├── models/              # Modelos de dominio
   │       ├── services/            # Lógica de negocio y persistencia
   │       ├── tests/               # Pruebas unitarias (Vitest)
-  │       ├── styles/              # Estilos CSS
+  │       |   ├── components/      # Pruebas de componentes
+  │       |   ├── services/        # Pruebas de componentes de React
+  |       |   └── utils/           # Pruebas de utilidades
   │       ├── utils/               # Utilidades y helpers
   │       ├── index.html           # Plantilla HTML principal
   │       └── main.jsx             # Entrada de la aplicación (React)

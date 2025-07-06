@@ -4,13 +4,12 @@
   "printWidth": 100,
   "tabWidth": 2,
   "trailingComma": "es5",
+  "bracketSpacing": true,
+  "arrowParens": "avoid",
+  "endOfLine": "lf",
   "overrides": [
     {
-      "files": [
-        "*.js",
-        "*.mjs",
-        "*.jsx"
-      ],
+      "files": ["*.js", "*.mjs", "*.jsx"],
       "options": {
         "tabWidth": 2,
         "useTabs": false,

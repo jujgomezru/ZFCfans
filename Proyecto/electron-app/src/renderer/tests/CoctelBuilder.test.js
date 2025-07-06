@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import CoctelBuilder from '../builders/CoctelBuilder.js';
+import { describe, expect, it } from 'vitest';
+import CoctelBuilder from '../builders/CoctelBuilder.js'; // El test fallará; aún no implementado
 
 describe('CoctelBuilder', () => {
   it('construye un cóctel básico correctamente', () => {

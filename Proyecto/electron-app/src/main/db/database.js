@@ -1,12 +1,12 @@
 import Database from 'better-sqlite3';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import { app } from 'electron';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// Obtener directorio de datos del usuario (escribible)
+const userDataPath = app.getPath('userData');
+const dbPath = path.join(userDataPath, 'zfcocteles.db');
 
-// Ruta hacia public/ desde src/main/db/
-const dbPath = path.join(__dirname, '../../../public/zfcocteles.db');
+console.log('📍 Base de datos ubicada en:', dbPath);
 
 const db = new Database(dbPath);
 
@@ -26,11 +26,13 @@ db.prepare(
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )
-`
+`,
 ).run();
 
 // Crear índices para mejorar performance
 db.prepare('CREATE INDEX IF NOT EXISTS idx_categoria ON cocteles(categoria)').run();
 db.prepare('CREATE INDEX IF NOT EXISTS idx_nombre ON cocteles(nombre)').run();
+
+console.log('✅ Base de datos inicializada correctamente');
 
 export default db;
