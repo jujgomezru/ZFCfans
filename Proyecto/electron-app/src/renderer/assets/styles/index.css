@@ -1,0 +1,46 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #f9f6f2;
+  margin: 0;
+  padding: 0;
+}
+
+/* Asegurar que antialiased funcione */
+.antialiased {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d1c8bc;
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #bdae9c;
+}
+
+/* Tag styles */
+.tag-aperitivo {
+  background-color: #feebc8;
+  color: #c05621;
+}
+
+.tag-digestivo {
+  background-color: #d6eaf8;
+  color: #2b6cb0;
+}
