@@ -1,94 +1,44 @@
 # 🥂 ZFCocteles - Aplicación de Gestión de Cócteles
 
 Aplicación de escritorio construida con **Electron**, **React** y **Vite** para gestionar recetas de cócteles, utilizando una base de datos local (`better-sqlite3`).
+
 El proyecto sigue una arquitectura **monolítica**, basada en los patrones de diseño **Builder + MVC**.
 
 ---
 
-## 🚀 Configuración Inicial
-
-> ✅ **Requisitos:** Node.js v20.x
-
-> 💡 **Recomendado:** Usar nvm para manejar versiones de Node.js
-
-### 1. Clonar el repositorio
+## 🚀 Inicio Rápido
 
 ```bash
+# 1. Clonar repositorio
 git clone git@github.com:jujgomezru/ZFCfans.git
 cd ZFCfans/Proyecto/electron-app
-```
 
-### 2. Configurar el entorno por primera vez
-
-```bash
+# 2. Configurar automáticamente
 npm run setup
-```
 
-Este ejecuta automáticamente los siguientes comandos:
-
-- `npm install` → instala dependencias
-- `electron-rebuild` → recompila los binarios nativos (better-sqlite3) para Electron
-
-### 3. Instalar extensiones recomendadas (VS Code)
-
-1. Abre el proyecto en Visual Studio Code
-2. Presiona `Ctrl+Shift+P` → `"Extensions: Show Recommended Extensions"`
-3. Instala todas las sugeridas para un entorno óptimo
-
-### 4. Ejecutar la aplicación
-
-```bash
+# 3. Ejecutar aplicación
 npm run dev
 ```
 
-## 🏃‍♂️ Scripts disponibles
+## 📚 Documentación
+
+- **[📖 Guía de Onboarding](docs/ONBOARDING.md)** - Setup detallado para nuevos desarrolladores
+- **[🏛️ Arquitectura](docs/ARCHITECTURE.md)** - Patrones de diseño y estructura del código
+- **[🧪 Testing](docs/TESTING.md)** - Guía completa de pruebas
+- **[🚀 Deployment](docs/DEPLOYMENT.md)** - Proceso de distribución
+
+## 🏃‍♂️ Scripts Principales
 
 ```bash
-# 🔧 Instala todo y recompila native modules
-npm run setup
-
-# 🚀 Ejecuta la app en modo desarrollo (Electron + Vite)
-npm run dev
-
-# 📦 Compila todo y crea instalador (Windows: .exe, macOS: .dmg)
-npm run build
-
-# 📦 Compila el frontend con Vite
-npm run build:renderer
-
-# Compila y empaqueta sin crear instalador (más rápido para pruebas)
-npm run pack
-
-# Compila y crea instalador sin subirlo (para distribución local)
-npm run dist
-
-# 🧪 Ejecuta los tests con Vitest
-npm run test
-
-# 📏 Ejecuta ESLint para revisar estilo, errores y convenciones
-npm run lint
-
-# 🛠 Corrige automáticamente problemas de estilo y convenciones con ESLint
-npm run lint:fix
-
-# 🎨 Formatea el código con Prettier
-npm run format
-
-# ✅ Verifica el formato del código con Prettier
-npm run format:check
-
-# 📊 Ejecuta pruebas de calidad de código (formato + lint + tests)
-npm run code-quality
-
-# 🛠 Recompila better-sqlite3 para Electron (puede usarse manualmente)
-npm run rebuild-sqlite
-
-# ⚙️ Instala dependencias de Electron y recompila native modules
-npm run postinstall
-
+npm run dev          # Desarrollo
+npm run test         # Tests
+npm run build        # Build completo
+npm run code-quality # Calidad de código
 ```
 
-## 🏗️ Estructura del proyecto
+[Ver todos los scripts disponibles →](docs/ONBOARDING.md#scripts-disponibles)
+
+## 🏗️ Estructura del Proyecto
 
 ```
 ZFCFANS/
@@ -128,7 +78,21 @@ ZFCFANS/
 
 ```
 
-## 🛠️ Stack tecnológico
+## 🎯 Estado Actual
+
+- ✅ **Configuración base completa** (ESM, tooling, testing)
+- ✅ **Base de datos configurada** (SQLite con better-sqlite3)
+- ✅ **IPC establecido** (comunicación Electron ↔ React)
+- ✅ **Testing setup** (100%)
+- 🔧 **Interfaz en desarrollo** (migrando desde prototipo HTML)
+- 🔧 **Arquitectura MVC + Builder** (en implementación)
+- ❌ **Modelos y builders de cócteles** (pendiente)
+- ❌ **Controladores y servicios** (pendiente)
+- ❌ **Pruebas unitarias** (pendiente)
+- ❌ **Documentación completa** (pendiente)
+- ❌ **Empaquetado final** (pendiente)
+
+## 🛠️ Stack Tecnológico
 
 | Herramienta          | Rol                                                              |
 | -------------------- | ---------------------------------------------------------------- |
@@ -143,54 +107,6 @@ ZFCFANS/
 | **cross-env**        | Define variables de entorno multiplataforma                      |
 | **electron-rebuild** | Recompila módulos nativos (como SQLite) para usarse con Electron |
 
-## 🎯 Desarrollo actual
-
-### Estado del proyecto:
-
-- ✅ **Configuración base completa** (ESM, tooling, testing)
-- ✅ **Base de datos configurada** (SQLite con better-sqlite3)
-- ✅ **IPC establecido** (comunicación Electron ↔ React)
-- ✅ **Testing setup** (100%)
-- 🔧 **Interfaz en desarrollo** (migrando desde prototipo HTML)
-- 🔧 **Arquitectura MVC + Builder** (en implementación)
-- ❌ **Modelos y builders de cócteles** (pendiente)
-- ❌ **Controladores y servicios** (pendiente)
-- ❌ **Pruebas unitarias** (pendiente)
-- ❌ **Documentación completa** (pendiente)
-- ❌ **Empaquetado final** (pendiente)
-
-### Próximos pasos:
-
-1. Migrar diseño de `ZFCoctelesv1.html` a componentes React (en desarrollo)
-2. Implementar modelos y builders para cócteles
-
-- Crear modelos de datos para cócteles, ingredientes y categorías
-- Implementar lógica de construcción de cócteles con patrones Builder
-
-3. Desarrollar controladores y servicios
-
-- Implementar controladores para manejar la lógica de negocio
-- Crear servicios para interactuar con la base de datos y la lógica de aplicación
-- Implementar lógica de negocio para manipular cócteles, ingredientes y categorías
-
-4. Completar pruebas unitarias con Vitest
-
-- Implementar pruebas para modelos, builders y controladores
-- Asegurar cobertura de código adecuada
-
-5. Completar documentación del proyecto
-6. Preparar empaquetado final con electron-builder
-7. Realizar pruebas de usuario y ajustes finales
-
 ---
 
-## 🏁 ¡Comenzemos!
-
-```bash
-npm run dev
-```
-
-Esto iniciará:
-
-- **Vite dev server** en `http://localhost:5173`
-- **Electron app** que carga automáticamente la aplicación React
+**¿Nuevo en el proyecto?** Comienza con la [Guía de Onboarding](docs/ONBOARDING.md) 🚀
