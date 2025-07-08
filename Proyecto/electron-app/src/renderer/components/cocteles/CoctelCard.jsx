@@ -21,7 +21,7 @@ function CoctelCard({ coctel }) {
         <img
           src={imagen || 'https://placehold.co/192x192/E2E8F0/4A5568?text=Cóctel'}
           alt={nombre}
-          className="w-full h-full object-contain"
+          className="w-full h-full object-cover rounded-lg"
           loading="lazy"
         />
       </div>

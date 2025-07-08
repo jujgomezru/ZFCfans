@@ -1,5 +1,5 @@
 import { AlertIcon, BackIcon, ChecklistIcon, ForwardIcon, PlusIcon } from '../icons/Icons';
-import SearchBar from '../ui/SearchBar';
+import SearchBar from '../common/SearchBar';
 
 function Header() {
   const handleSearch = searchTerm => {

@@ -1,5 +1,5 @@
 import CoctelGrid from '../cocteles/CoctelGrid';
-import FilterDropdown from '../ui/FilterDropdown';
+import FilterDropdown from '../common/FilterDropdown';
 import Footer from './Footer';
 
 function MainContent() {
