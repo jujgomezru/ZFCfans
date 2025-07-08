@@ -22,6 +22,24 @@ const mockCocteles = [
     categoria: 'digestivo',
     imagen: 'https://th.bing.com/th/id/OIP.vYIymbjbJdADafbswXH__gAAAA?rs=1&pid=ImgDetMain',
   },
+  {
+    id: 4,
+    nombre: 'Mojito',
+    categoria: 'aperitivo',
+    imagen: 'https://placehold.co/192x192/E2E8F0/4A5568?text=Mojito',
+  },
+  {
+    id: 5,
+    nombre: 'Margarita',
+    categoria: 'aperitivo',
+    imagen: 'https://placehold.co/192x192/E2E8F0/4A5568?text=Margarita',
+  },
+  {
+    id: 6,
+    nombre: 'Old Fashioned',
+    categoria: 'digestivo',
+    imagen: 'https://placehold.co/192x192/E2E8F0/4A5568?text=Old+Fashioned',
+  },
 ];
 
 function CoctelGrid() {

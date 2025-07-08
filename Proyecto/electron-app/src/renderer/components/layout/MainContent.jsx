@@ -1,7 +1,34 @@
 import CoctelGrid from '../cocteles/CoctelGrid';
-import { ChevronDownIcon } from '../icons/Icons';
+import FilterDropdown from '../ui/FilterDropdown';
+import Footer from './Footer';
 
 function MainContent() {
+  // Opciones para los filtros
+  const tipoLicorOptions = [
+    { value: 'whisky', label: 'Whisky' },
+    { value: 'vodka', label: 'Vodka' },
+    { value: 'ron', label: 'Ron' },
+    { value: 'tequila', label: 'Tequila' },
+    { value: 'gin', label: 'Gin' },
+  ];
+
+  const dificultadOptions = [
+    { value: 'facil', label: 'Fácil' },
+    { value: 'medio', label: 'Medio' },
+    { value: 'dificil', label: 'Difícil' },
+  ];
+
+  const categoriaOptions = [
+    { value: 'aperitivo', label: 'Aperitivo' },
+    { value: 'digestivo', label: 'Digestivo' },
+    { value: 'dulce', label: 'Dulce' },
+    { value: 'tropical', label: 'Tropical' },
+  ];
+
+  const handleFilterChange = (filterType, value) => {
+    // Aquí implementarías la lógica de filtrado
+    console.log(`${filterType} changed to:`, value);
+  };
   return (
     <div className="flex-1 p-8 overflow-y-auto">
       {/* Header with title and filters */}
@@ -10,26 +37,23 @@ function MainContent() {
 
         {/* Filter Dropdowns */}
         <div className="flex items-center gap-4">
-          <div className="relative">
-            <select className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2.5 pr-8 text-gray-700 font-medium focus:outline-none focus:ring-2 focus:ring-orange-300 transition-shadow">
-              <option>Tipo de licor</option>
-            </select>
-            <ChevronDownIcon className="w-5 h-5 absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
-          </div>
+          <FilterDropdown
+            placeholder="Tipo de licor"
+            options={tipoLicorOptions}
+            onChange={value => handleFilterChange('tipoLicor', value)}
+          />
 
-          <div className="relative">
-            <select className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2.5 pr-8 text-gray-700 font-medium focus:outline-none focus:ring-2 focus:ring-orange-300 transition-shadow">
-              <option>Dificultad</option>
-            </select>
-            <ChevronDownIcon className="w-5 h-5 absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
-          </div>
+          <FilterDropdown
+            placeholder="Dificultad"
+            options={dificultadOptions}
+            onChange={value => handleFilterChange('dificultad', value)}
+          />
 
-          <div className="relative">
-            <select className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2.5 pr-8 text-gray-700 font-medium focus:outline-none focus:ring-2 focus:ring-orange-300 transition-shadow">
-              <option>Categoría</option>
-            </select>
-            <ChevronDownIcon className="w-5 h-5 absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
-          </div>
+          <FilterDropdown
+            placeholder="Categoría"
+            options={categoriaOptions}
+            onChange={value => handleFilterChange('categoria', value)}
+          />
         </div>
       </div>
 
@@ -37,14 +61,7 @@ function MainContent() {
       <CoctelGrid />
 
       {/* Content footer */}
-      <footer className="flex-shrink-0 p-6 text-right">
-        <a
-          href="#"
-          className="text-sm text-gray-500 hover:text-gray-800 hover:underline transition-colors"
-        >
-          Política de consumo responsable
-        </a>
-      </footer>
+      <Footer />
     </div>
   );
 }
