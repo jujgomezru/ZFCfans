@@ -9,6 +9,14 @@ body {
   padding: 0;
 }
 
+button {
+  @apply transition-colors duration-200;
+}
+
+button:hover {
+  cursor: pointer;
+}
+
 /* Asegurar que antialiased funcione */
 .antialiased {
   -webkit-font-smoothing: antialiased;
@@ -31,6 +39,7 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #bdae9c;
+  cursor: pointer;
 }
 
 /* Component styles */

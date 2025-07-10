@@ -30,9 +30,9 @@ function MainContent() {
     console.log(`${filterType} changed to:`, value);
   };
   return (
-    <div className="flex-1 p-8 overflow-y-auto">
+    <div className="flex-1 overflow-y-auto">
       {/* Header with title and filters */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="sticky top-0 z-10 bg-[#FDFBF8] flex items-center justify-between  mb-4 p-8">
         <h2 className="text-4xl font-bold text-gray-800">Catálogo</h2>
 
         {/* Filter Dropdowns */}
@@ -58,7 +58,9 @@ function MainContent() {
       </div>
 
       {/* Cocktail cards grid */}
-      <CoctelGrid />
+      <div className="p-8">
+        <CoctelGrid />
+      </div>
 
       {/* Content footer */}
       <Footer />
