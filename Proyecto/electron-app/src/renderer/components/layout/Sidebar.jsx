@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import {
   BookIcon,
   CatalogIcon,
@@ -8,9 +7,10 @@ import {
   SettingsIcon,
   StarIcon,
 } from '../icons/Icons';
+import { useNavigation } from '../../context/NavigationContext';
 
 function Sidebar() {
-  const [activeMenu, setActiveMenu] = useState('catalogo');
+  const { currentPage, navigateTo } = useNavigation();
 
   const menuItems = [
     { id: 'catalogo', name: 'Catálogo', icon: CatalogIcon },
@@ -39,9 +39,9 @@ function Sidebar() {
             return (
               <li key={item.id}>
                 <button
-                  onClick={() => setActiveMenu(item.id)}
+                  onClick={() => navigateTo(item.id)}
                   className={`w-full flex items-center gap-4 p-3 rounded-lg font-medium transition-colors ${
-                    activeMenu === item.id
+                    currentPage === item.id
                       ? 'bg-orange-100/60 text-[#E58D4B] font-semibold'
                       : 'hover:bg-gray-100 text-gray-600'
                   }`}

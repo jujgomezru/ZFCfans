@@ -1,66 +1,42 @@
-import CoctelGrid from '../cocteles/CoctelGrid';
-import FilterDropdown from '../common/FilterDropdown';
+import {
+  AjustesPage,
+  CatalogoPage,
+  ConsumoResponsablePage,
+  CrearPage,
+  FavoritosPage,
+  HistorialPage,
+  ManualPage,
+} from '../../pages';
+import { useNavigation } from '../../context/NavigationContext';
 import Footer from './Footer';
 
 function MainContent() {
-  // Opciones para los filtros
-  const tipoLicorOptions = [
-    { value: 'whisky', label: 'Whisky' },
-    { value: 'vodka', label: 'Vodka' },
-    { value: 'ron', label: 'Ron' },
-    { value: 'tequila', label: 'Tequila' },
-    { value: 'gin', label: 'Gin' },
-  ];
+  const { currentPage } = useNavigation();
 
-  const dificultadOptions = [
-    { value: 'facil', label: 'Fácil' },
-    { value: 'medio', label: 'Medio' },
-    { value: 'dificil', label: 'Difícil' },
-  ];
-
-  const categoriaOptions = [
-    { value: 'aperitivo', label: 'Aperitivo' },
-    { value: 'digestivo', label: 'Digestivo' },
-    { value: 'dulce', label: 'Dulce' },
-    { value: 'tropical', label: 'Tropical' },
-  ];
-
-  const handleFilterChange = (filterType, value) => {
-    // Aquí implementarías la lógica de filtrado
-    console.log(`${filterType} changed to:`, value);
+  const renderPage = () => {
+    switch (currentPage) {
+      case 'catalogo':
+        return <CatalogoPage />;
+      case 'favoritos':
+        return <FavoritosPage />;
+      case 'crear':
+        return <CrearPage />;
+      case 'manual':
+        return <ManualPage />;
+      case 'historial':
+        return <HistorialPage />;
+      case 'ajustes':
+        return <AjustesPage />;
+      case 'consumo-responsable':
+        return <ConsumoResponsablePage />;
+      default:
+        return <CatalogoPage />;
+    }
   };
+
   return (
     <div className="flex-1 overflow-y-auto">
-      {/* Header with title and filters */}
-      <div className="sticky top-0 z-10 bg-[#FDFBF8] flex items-center justify-between  mb-4 p-8">
-        <h2 className="text-4xl font-bold text-gray-800">Catálogo</h2>
-
-        {/* Filter Dropdowns */}
-        <div className="flex items-center gap-4">
-          <FilterDropdown
-            placeholder="Tipo de licor"
-            options={tipoLicorOptions}
-            onChange={value => handleFilterChange('tipoLicor', value)}
-          />
-
-          <FilterDropdown
-            placeholder="Dificultad"
-            options={dificultadOptions}
-            onChange={value => handleFilterChange('dificultad', value)}
-          />
-
-          <FilterDropdown
-            placeholder="Categoría"
-            options={categoriaOptions}
-            onChange={value => handleFilterChange('categoria', value)}
-          />
-        </div>
-      </div>
-
-      {/* Cocktail cards grid */}
-      <div className="p-8">
-        <CoctelGrid />
-      </div>
+      {renderPage()}
 
       {/* Content footer */}
       <Footer />
