@@ -3,7 +3,8 @@ import SearchBar from '../common/SearchBar';
 import { useNavigation } from '../../context/NavigationContext';
 
 function Header() {
-  const { navigateTo } = useNavigation();
+  const { navigateTo, navigateNext, navigatePrevious, getCurrentPageInfo } = useNavigation();
+  const pageInfo = getCurrentPageInfo();
 
   const handleSearch = _searchTerm => {
     // TODO: implementar lógica de búsqueda
@@ -14,10 +15,18 @@ function Header() {
       {/* Left side: nav arrows */}
       <div className="flex items-center gap-6">
         <div className="flex items-center gap-3 text-gray-500">
-          <button title="Página anterior" className="hover:text-gray-700 transition-colors">
+          <button
+            title={`Página anterior: ${pageInfo.previousName}`}
+            className="p-1 rounded-md hover:text-gray-700 hover:bg-gray-100 transition-all duration-200"
+            onClick={navigatePrevious}
+          >
             <BackIcon />
           </button>
-          <button title="Página siguiente" className="hover:text-gray-700 transition-colors">
+          <button
+            title={`Página siguiente: ${pageInfo.nextName}`}
+            className="p-1 rounded-md hover:text-gray-700 hover:bg-gray-100 transition-all duration-200"
+            onClick={navigateNext}
+          >
             <ForwardIcon />
           </button>
         </div>

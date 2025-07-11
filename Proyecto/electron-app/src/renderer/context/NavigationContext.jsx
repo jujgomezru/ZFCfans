@@ -2,6 +2,23 @@ import { createContext, useContext, useState } from 'react';
 
 const NavigationContext = createContext();
 
+// Orden de páginas para navegación circular (mismo orden que en el Sidebar)
+const pageOrder = ['catalogo', 'favoritos', 'crear', 'manual', 'historial', 'ajustes'];
+
+// Nombres legibles para las páginas (incluyendo páginas externas)
+const pageNames = {
+  catalogo: 'Catálogo',
+  favoritos: 'Favoritos',
+  crear: 'Crear cóctel',
+  manual: 'Manual',
+  historial: 'Historial',
+  ajustes: 'Ajustes',
+  // Páginas externas (no en sidebar)
+  usuario: 'Usuario',
+  preparacion: 'Preparar cóctel',
+  'consumo-responsable': 'Consumo responsable',
+};
+
 export function NavigationProvider({ children }) {
   const [currentPage, setCurrentPage] = useState('catalogo');
 
@@ -9,8 +26,72 @@ export function NavigationProvider({ children }) {
     setCurrentPage(pageId);
   };
 
+  const navigateNext = () => {
+    // Si estamos en una página externa, ir a catálogo primero
+    if (!pageOrder.includes(currentPage)) {
+      setCurrentPage('catalogo');
+      return;
+    }
+
+    const currentIndex = pageOrder.indexOf(currentPage);
+    const nextIndex = (currentIndex + 1) % pageOrder.length;
+    setCurrentPage(pageOrder[nextIndex]);
+  };
+
+  const navigatePrevious = () => {
+    // Si estamos en una página externa, ir a catálogo primero
+    if (!pageOrder.includes(currentPage)) {
+      setCurrentPage('catalogo');
+      return;
+    }
+
+    const currentIndex = pageOrder.indexOf(currentPage);
+    const previousIndex = currentIndex === 0 ? pageOrder.length - 1 : currentIndex - 1;
+    setCurrentPage(pageOrder[previousIndex]);
+  };
+
+  const getCurrentPageInfo = () => {
+    // Si estamos en una página externa al sidebar
+    if (!pageOrder.includes(currentPage)) {
+      return {
+        current: currentPage,
+        currentName: pageNames[currentPage] || 'Página desconocida',
+        currentIndex: 0,
+        total: pageOrder.length,
+        next: 'catalogo',
+        nextName: pageNames.catalogo,
+        previous: 'catalogo',
+        previousName: pageNames.catalogo,
+      };
+    }
+
+    // Si estamos en una página del sidebar, comportamiento normal
+    const currentIndex = pageOrder.indexOf(currentPage);
+    const nextIndex = (currentIndex + 1) % pageOrder.length;
+    const previousIndex = currentIndex === 0 ? pageOrder.length - 1 : currentIndex - 1;
+
+    return {
+      current: currentPage,
+      currentName: pageNames[currentPage],
+      currentIndex: currentIndex + 1,
+      total: pageOrder.length,
+      next: pageOrder[nextIndex],
+      nextName: pageNames[pageOrder[nextIndex]],
+      previous: pageOrder[previousIndex],
+      previousName: pageNames[pageOrder[previousIndex]],
+    };
+  };
+
   return (
-    <NavigationContext.Provider value={{ currentPage, navigateTo }}>
+    <NavigationContext.Provider
+      value={{
+        currentPage,
+        navigateTo,
+        navigateNext,
+        navigatePrevious,
+        getCurrentPageInfo,
+      }}
+    >
       {children}
     </NavigationContext.Provider>
   );
