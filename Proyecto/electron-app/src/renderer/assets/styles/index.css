@@ -1,0 +1,77 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import 'tailwindcss';
+
+/* Base styles */
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #f9f6f2;
+  margin: 0;
+  padding: 0;
+}
+
+button {
+  @apply transition-colors duration-200;
+}
+
+button:hover {
+  cursor: pointer;
+}
+
+/* Asegurar que antialiased funcione */
+.antialiased {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d1c8bc;
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #bdae9c;
+  cursor: pointer;
+}
+
+/* Component styles */
+@layer components {
+  .tag-aperitivo {
+    @apply bg-orange-100 text-orange-700;
+  }
+
+  .tag-digestivo {
+    @apply bg-blue-100 text-blue-700;
+  }
+
+  .tag-dulce {
+    @apply bg-yellow-100 text-yellow-800;
+  }
+
+  /* Button hover effects */
+  .btn-primary {
+    @apply bg-orange-500 text-white hover:bg-orange-600 transition-colors duration-200;
+  }
+
+  .btn-secondary {
+    @apply bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-colors duration-200;
+  }
+
+  /* Card hover effects */
+  .cocktail-card {
+    @apply bg-white rounded-2xl p-5 shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100;
+  }
+
+  /* Focus states */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-orange-300 focus:ring-offset-1;
+  }
+}
