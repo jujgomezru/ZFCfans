@@ -1,4 +1,4 @@
-import { CheckCircleIcon, ClockIcon, UsersIcon, WarningIcon } from '../components/icons/Icons';
+import { ClockIcon, FoodIcon, ForbiddenIcon, WarningIcon } from '../components/icons/Icons';
 
 function ConsumoResponsablePage() {
   return (
@@ -39,7 +39,7 @@ function ConsumoResponsablePage() {
           {/* Card 2 */}
           <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
             <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-              <CheckCircleIcon className="w-6 h-6 text-green-600" />
+              <ForbiddenIcon className="w-6 h-6 text-green-600" />
             </div>
             <h4 className="text-xl font-semibold text-gray-800 mb-3">Nunca Conduzcas</h4>
             <p className="text-gray-600">
@@ -51,7 +51,7 @@ function ConsumoResponsablePage() {
           {/* Card 3 */}
           <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
             <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mb-4">
-              <UsersIcon className="w-6 h-6 text-yellow-600" />
+              <FoodIcon className="w-6 h-6 text-yellow-600" />
             </div>
             <h4 className="text-xl font-semibold text-gray-800 mb-3">Acompaña con Comida</h4>
             <p className="text-gray-600">

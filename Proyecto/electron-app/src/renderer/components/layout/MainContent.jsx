@@ -6,6 +6,8 @@ import {
   FavoritosPage,
   HistorialPage,
   ManualPage,
+  PreparacionPage,
+  UsuarioPage,
 } from '../../pages';
 import { useNavigation } from '../../context/NavigationContext';
 import Footer from './Footer';
@@ -29,6 +31,10 @@ function MainContent() {
         return <AjustesPage />;
       case 'consumo-responsable':
         return <ConsumoResponsablePage />;
+      case 'preparacion':
+        return <PreparacionPage />;
+      case 'usuario':
+        return <UsuarioPage />;
       default:
         return <CatalogoPage />;
     }

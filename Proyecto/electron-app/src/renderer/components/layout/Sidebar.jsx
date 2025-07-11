@@ -39,6 +39,7 @@ function Sidebar() {
             return (
               <li key={item.id}>
                 <button
+                  title={item.name}
                   onClick={() => navigateTo(item.id)}
                   className={`w-full flex items-center gap-4 p-3 rounded-lg font-medium transition-colors ${
                     currentPage === item.id
