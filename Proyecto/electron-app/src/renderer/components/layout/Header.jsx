@@ -1,4 +1,4 @@
-import { AlertIcon, BackIcon, ChecklistIcon, ForwardIcon } from '../icons/Icons';
+import { BackIcon, BellIcon, CocktailShakerIcon, ForwardIcon } from '../icons/Icons';
 import SearchBar from '../common/SearchBar';
 import { useNavigation } from '../../context/NavigationContext';
 
@@ -44,15 +44,15 @@ function Header() {
           className="p-2 rounded-full hover:bg-gray-100 text-gray-600 transition-colors"
           onClick={() => navigateTo('preparacion')}
         >
-          <ChecklistIcon />
+          <CocktailShakerIcon />
         </button>
         <div className="w-px h-6 bg-gray-300 mx-2" />
         <button
-          title="Política de consumo resposable"
+          title="Notificaciones"
           className="p-2 rounded-full hover:bg-gray-100 text-gray-600 transition-colors"
-          onClick={() => navigateTo('consumo-responsable')}
+          onClick={() => navigateTo('notificaciones')}
         >
-          <AlertIcon />
+          <BellIcon />
         </button>
         <button
           title="Usuario"

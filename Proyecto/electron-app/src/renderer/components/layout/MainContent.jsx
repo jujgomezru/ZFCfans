@@ -1,11 +1,12 @@
 import {
   AjustesPage,
   CatalogoPage,
+  CategoriasPage,
   ConsumoResponsablePage,
   CrearPage,
-  FavoritosPage,
   HistorialPage,
   ManualPage,
+  NotificacionesPage,
   PreparacionPage,
   UsuarioPage,
 } from '../../pages';
@@ -19,8 +20,8 @@ function MainContent() {
     switch (currentPage) {
       case 'catalogo':
         return <CatalogoPage />;
-      case 'favoritos':
-        return <FavoritosPage />;
+      case 'categorias':
+        return <CategoriasPage />;
       case 'crear':
         return <CrearPage />;
       case 'manual':
@@ -35,6 +36,8 @@ function MainContent() {
         return <PreparacionPage />;
       case 'usuario':
         return <UsuarioPage />;
+      case 'notificaciones':
+        return <NotificacionesPage />;
       default:
         return <CatalogoPage />;
     }

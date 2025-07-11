@@ -33,7 +33,7 @@ function UsuarioPage() {
         </div>
 
         {/* Profile Features Preview */}
-        <div className="max-w-4xl mx-auto mt-4">
+        <div className="max-w-4xl mx-auto mt-16">
           <h4 className="text-xl font-semibold text-gray-800 mb-8 text-center">
             Próximas Funcionalidades
           </h4>

@@ -3,20 +3,21 @@ import { createContext, useContext, useState } from 'react';
 const NavigationContext = createContext();
 
 // Orden de páginas para navegación circular (mismo orden que en el Sidebar)
-const pageOrder = ['catalogo', 'favoritos', 'crear', 'manual', 'historial', 'ajustes'];
+const pageOrder = ['catalogo', 'categorias', 'crear', 'historial', 'manual', 'ajustes'];
 
 // Nombres legibles para las páginas (incluyendo páginas externas)
 const pageNames = {
   catalogo: 'Catálogo',
-  favoritos: 'Favoritos',
+  categorias: 'Categorías',
   crear: 'Crear cóctel',
-  manual: 'Manual',
   historial: 'Historial',
+  manual: 'Manual',
   ajustes: 'Ajustes',
   // Páginas externas (no en sidebar)
   usuario: 'Usuario',
   preparacion: 'Preparar cóctel',
   'consumo-responsable': 'Consumo responsable',
+  notificaciones: 'Notificaciones',
 };
 
 export function NavigationProvider({ children }) {

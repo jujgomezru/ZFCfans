@@ -15,6 +15,23 @@ export const AlertIcon = ({ className = 'w-6 h-6' }) => (
   </svg>
 );
 
+export const ArchiveIcon = ({ className = 'w-6 h-6' }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    className={className}
+    aria-hidden="true"
+    fill="none"
+    viewBox="0 0 24 24"
+  >
+    <path
+      stroke="currentColor"
+      strokeLinejoin="round"
+      strokeWidth="1.5"
+      d="M10 12v1h4v-1m4 7H6a1 1 0 0 1-1-1V9h14v9a1 1 0 0 1-1 1ZM4 5h16a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z"
+    />
+  </svg>
+);
+
 export const BackIcon = ({ className = 'w-5 h-5' }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -26,6 +43,23 @@ export const BackIcon = ({ className = 'w-5 h-5' }) => (
       fillRule="evenodd"
       d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
       clipRule="evenodd"
+    />
+  </svg>
+);
+
+export const BellIcon = ({ className = 'w-6 h-6' }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    className={className}
+    fill="none"
+    viewBox="0 0 24 24"
+    strokeWidth="1.5"
+    stroke="currentColor"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"
     />
   </svg>
 );
@@ -167,6 +201,23 @@ export const ClockIcon = ({ className = 'w-6 h-6' }) => (
   </svg>
 );
 
+export const CocktailShakerIcon = ({ className = 'w-6 h-6' }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    className={className}
+    fill="none"
+    viewBox="0 0 32 32"
+    preserveAspectRatio="xMidYMid meet"
+    stroke="currentColor"
+  >
+    <g transform="translate(0, 32) scale(0.1,-0.1)" fill="currentColor" stroke="none">
+      <path d="M92 280 c-35 -21 -72 -74 -72 -102 0 -28 17 -21 25 10 9 37 51 80 86 87 16 4 29 11 29 16 0 15 -33 10 -68 -11z" />
+      <path d="M225 280 c-10 -11 -29 -20 -42 -20 -40 0 -60 -17 -114 -97 l-51 -75 35 -35 35 -35 75 51 c80 54 97 74 97 114 0 13 9 32 20 42 25 22 25 37 2 58 -24 22 -35 21 -57 -3z m41 -39 c-22 -21 -46 0 -26 24 10 12 16 13 27 3 12 -10 12 -13 -1 -27z m-46 -21 c22 -22 25 -46 10 -70 -8 -12 -17 -8 -51 26 -23 23 -38 47 -35 53 11 18 54 13 76 -9z m-50 -121 c-57 -48 -77 -55 -100 -34 -27 24 -25 32 16 89 l36 48 40 -38 39 -39 -31 -26z" />
+      <path d="M275 133 c-9 -38 -51 -81 -86 -88 -32 -7 -40 -25 -11 -25 45 0 122 77 122 123 0 27 -17 20 -25 -10z" />
+    </g>
+  </svg>
+);
+
 export const CreateIcon = ({ className = 'w-6 h-6' }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -225,6 +276,24 @@ export const ForwardIcon = ({ className = 'w-5 h-5' }) => (
       fillRule="evenodd"
       d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
       clipRule="evenodd"
+    />
+  </svg>
+);
+
+export const InboxIcon = ({ className = 'w-6 h-6' }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    className={className}
+    aria-hidden="true"
+    fill="none"
+    viewBox="0 0 24 24"
+  >
+    <path
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="1.5"
+      d="M4 13h3.439a.991.991 0 0 1 .908.6 3.978 3.978 0 0 0 7.306 0 .99.99 0 0 1 .908-.6H20M4 13v6a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-6M4 13l2-9h12l2 9"
     />
   </svg>
 );

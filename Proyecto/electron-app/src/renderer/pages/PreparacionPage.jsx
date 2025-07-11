@@ -1,8 +1,8 @@
 import {
   CheckCircleIcon,
   ChecklistIcon,
-  ChecklistTaskIcon,
   ClockIcon,
+  CocktailShakerIcon,
 } from '../components/icons/Icons';
 
 function PreparacionPage() {
@@ -17,7 +17,7 @@ function PreparacionPage() {
       <div className="p-8">
         <div className="text-center py-16">
           <div className="w-24 h-24 mx-auto mb-6 bg-green-100 rounded-full flex items-center justify-center">
-            <ChecklistIcon className="w-12 h-12 text-green-600" />
+            <CocktailShakerIcon className="w-12 h-12 text-green-600" />
           </div>
           <h3 className="text-2xl font-bold text-gray-800 mb-3">Preparar cóctel</h3>
           <p className="text-gray-600 mb-6 max-w-md mx-auto">
@@ -32,7 +32,7 @@ function PreparacionPage() {
         </div>
 
         {/* Features Preview */}
-        <div className="max-w-4xl mx-auto mt-4">
+        <div className="max-w-4xl mx-auto mt-16">
           <h4 className="text-xl font-semibold text-gray-800 mb-8 text-center">
             Próximas Funcionalidades
           </h4>
@@ -40,7 +40,7 @@ function PreparacionPage() {
             {/* Feature 1 */}
             <div className="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                <ChecklistTaskIcon className="w-6 h-6 text-blue-600" />
+                <ChecklistIcon className="w-6 h-6 text-blue-600" />
               </div>
               <h5 className="font-semibold text-gray-800 mb-2">Lista de Verificación</h5>
               <p className="text-gray-600 text-sm">

@@ -1,11 +1,11 @@
 import {
+  ArchiveIcon,
   BookIcon,
   CatalogIcon,
   ClockIcon,
   CreateIcon,
   LogoIcon,
   SettingsIcon,
-  StarIcon,
 } from '../icons/Icons';
 import { useNavigation } from '../../context/NavigationContext';
 
@@ -14,10 +14,10 @@ function Sidebar() {
 
   const menuItems = [
     { id: 'catalogo', name: 'Catálogo', icon: CatalogIcon },
-    { id: 'favoritos', name: 'Favoritos', icon: StarIcon },
+    { id: 'categorias', name: 'Categorías', icon: ArchiveIcon },
     { id: 'crear', name: 'Crear cóctel', icon: CreateIcon },
-    { id: 'manual', name: 'Manual', icon: BookIcon },
     { id: 'historial', name: 'Historial', icon: ClockIcon },
+    { id: 'manual', name: 'Manual', icon: BookIcon },
     { id: 'ajustes', name: 'Ajustes', icon: SettingsIcon },
   ];
 
