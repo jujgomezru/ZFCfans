@@ -153,4 +153,6 @@ export function initializeSchema(db) {
   db.prepare(`CREATE INDEX IF NOT EXISTS idx_cocktails_name ON cocktails(name)`).run();
   db.prepare(`CREATE INDEX IF NOT EXISTS idx_cocktails_difficulty ON cocktails(difficulty)`).run();
   db.prepare(`CREATE INDEX IF NOT EXISTS idx_search_history_user ON search_history(user_id)`).run();
+  db.prepare(`CREATE INDEX IF NOT EXISTS idx_cocktail_images_cocktail_id ON cocktail_images(cocktail_id)`).run();
+  db.prepare(`CREATE INDEX IF NOT EXISTS idx_cocktail_steps_cocktail_id ON cocktail_steps(cocktail_id)`).run();
 }
