@@ -1,4 +1,10 @@
 export function insertarCoctelesIniciales(db) {
+  const yaHayCocteles = db.prepare(`SELECT COUNT(*) as count FROM cocktails`).get().count > 0;
+  if (yaHayCocteles) {
+    console.log('⚠️  Ya existen cócteles en la base de datos. No se insertaron duplicados.');
+    return;
+  }
+
   const cocktails = [
     {
       nombre: 'Aperol Spritz',

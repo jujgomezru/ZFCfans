@@ -1,16 +1,12 @@
 import { useEffect, useState } from 'react';
 import CoctelCard from './CoctelCard';
 
-console.log('🌐 API expuesta:', window.electronAPI);
-
 function CoctelGrid() {
   const [cocteles, setCocteles] = useState([]);
   const [error, setError] = useState(null);
   useEffect(() => {
     const cargar = async () => {
-      console.log('🔄 solicitando cocteles...');
       const res = await window.electronAPI.obtenerCocteles();
-      console.log('🧾 respuesta:', res);
       if (res?.success) {
         setCocteles(res.data);
       } else {
