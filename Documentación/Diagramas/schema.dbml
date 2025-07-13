@@ -11,6 +11,10 @@ Project ZFCCocteles {
     - Historial de preparación con métricas
     - Sistema de notificaciones
     - Configuración personalizable
+
+    🔄 ÚLTIMA ACTUALIZACIÓN: Julio 2025
+    ✅ Sincronizado con implementación en schema.sql
+    🎯 Incluye sistema de favoritos por categorías (superior)
   '''
 }
 
@@ -164,7 +168,7 @@ Table preparation_history {
   id_user integer [not null, ref: > users.id, note: 'Usuario que preparó']
   id_cocktail integer [not null, ref: > cocktails.id, note: 'Cóctel preparado']
   preparation_date text [not null, default: `datetime('now')`, note: 'Fecha de preparación']
-  score integer [default: 0, note: 'Calificación 0-5 estrellas']
+  score integer [default: 0, note: 'Calificación 0-5 estrellas (CHECK BETWEEN 0 AND 5)']
   comment text [note: 'Comentario del usuario']
   preparation_time integer [note: 'Tiempo REAL de preparación en minutos']
   difficulty_experienced text [note: 'Dificultad PERCIBIDA: fácil, media, difícil']
@@ -226,23 +230,23 @@ Table user_settings {
 // ÍNDICES PARA PERFORMANCE
 // ================================
 
-// Índices principales para optimización de consultas
-// CREATE INDEX idx_cocktails_difficulty ON cocktails(difficulty);
-// CREATE INDEX idx_cocktails_category ON cocktails(id_category);
-// CREATE INDEX idx_cocktails_owner ON cocktails(id_owner);
-// CREATE INDEX idx_preparation_history_user ON preparation_history(id_user);
-// CREATE INDEX idx_preparation_history_date ON preparation_history(preparation_date);
-// CREATE INDEX idx_notifications_user_unread ON notifications(id_user, is_read);
-// CREATE INDEX idx_recipe_steps_recipe ON recipe_steps(id_recipe, step_number);
+// Índices principales para optimización de consultas (IMPLEMENTADOS)
+CREATE INDEX IF NOT EXISTS idx_cocktails_difficulty ON cocktails(difficulty);
+CREATE INDEX IF NOT EXISTS idx_cocktails_category ON cocktails(id_category);
+CREATE INDEX IF NOT EXISTS idx_cocktails_owner ON cocktails(id_owner);
+CREATE INDEX IF NOT EXISTS idx_preparation_history_user ON preparation_history(id_user);
+CREATE INDEX IF NOT EXISTS idx_preparation_history_date ON preparation_history(preparation_date);
+CREATE INDEX IF NOT EXISTS idx_notifications_user_unread ON notifications(id_user, is_read);
+CREATE INDEX IF NOT EXISTS idx_recipe_steps_recipe ON recipe_steps(id_recipe, step_number);
 
 // ================================
 // ENUMS Y CONSTRAINTS
 // ================================
 
 Enum difficulty_levels {
-  facil [note: 'Fácil de preparar']
+  fácil [note: 'Fácil de preparar']
   media [note: 'Dificultad media']
-  dificil [note: 'Difícil - requiere experiencia']
+  difícil [note: 'Difícil - requiere experiencia']
 }
 
 Enum notification_types {

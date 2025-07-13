@@ -1,342 +1,250 @@
-# 🏛️ Arquitectura - ZFCocteles
+# 🏛️ Arquitectura Avanzada - ZFCocteles ✨
 
-Aplicación **monolítica** basada en **Electron + React + Vite** con patrón **Repository** y arquitectura por capas.
+**Aplicación Electron profesional** con arquitectura por capas **monolítica**, patrón **Repository Superior**, base de datos **SQLite normalizada** y **React moderno**.
 
-## 🎯 Diagrama de Arquitectura General
+## 🎯 ARQUITECTURA ACTUAL
 
-```
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│                          🥂 ZFCocteles - Arquitectura Monolítica                │
-└─────────────────────────────────────────────────────────────────────────────────┘
+### 📊 Visión General del Sistema
 
-     👤
-   Usuario  ──────────────┐
-                          │
-                          ▼
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│                         Aplicación Electron                                     │
-│  ┌─────────────────────────────────────────────────────────────────────────┐   │
-│  │                      Main Process (Node.js)                             │   │
-│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐    │   │
-│  │  │   Window    │  │   IPC       │  │  Database   │  │   File      │    │   │
-│  │  │  Manager    │  │  Handlers   │  │  Manager    │  │  System     │    │   │
-│  │  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘    │   │
-│  └─────────────────────────────────────┬───────────────────────────────────┘   │
-│                                        │ IPC Communication                     │
-│  ┌─────────────────────────────────────▼───────────────────────────────────┐   │
-│  │                    Renderer Process (React)                             │   │
-│  │                                                                          │   │
-│  │  ┌─────────────────────────────────────────────────────────────────┐   │   │
-│  │  │                        UI Layer (View)                          │   │   │
-│  │  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐              │   │   │
-│  │  │  │  Header +   │  │  Sidebar +  │  │   Pages +   │              │   │   │
-│  │  │  │ Navigation  │  │   Menu      │  │ Components  │              │   │   │
-│  │  │  └─────────────┘  └─────────────┘  └─────────────┘              │   │   │
-│  │  └─────────────────────────────────────────────────────────────────┘   │   │
-│  │                                  │                                      │   │
-│  │  ┌─────────────────────────────────▼─────────────────────────────────┐ │   │
-│  │  │                    Context & State Management                     │ │   │
-│  │  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐              │ │   │
-│  │  │  │ Navigation  │  │    User     │  │   Search    │              │ │   │
-│  │  │  │  Context    │  │   Context   │  │   Context   │              │ │   │
-│  │  │  └─────────────┘  └─────────────┘  └─────────────┘              │ │   │
-│  │  └─────────────────────────────────────────────────────────────────┘ │   │
-│  │                                  │                                    │   │
-│  │  ┌─────────────────────────────────▼─────────────────────────────────┐ │   │
-│  │  │                       Business Logic Layer                       │ │   │
-│  │  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐              │ │   │
-│  │  │  │   Coctel    │  │ Categories  │  │   Recipe    │              │ │   │
-│  │  │  │  Service    │  │  Service    │  │   Service   │              │ │   │
-│  │  │  └─────────────┘  └─────────────┘  └─────────────┘              │ │   │
-│  │  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐              │ │   │
-│  │  │  │    User     │  │Ingredients  │  │Notification │              │ │   │
-│  │  │  │   Service   │  │   Service   │  │   Service   │              │ │   │
-│  │  │  └─────────────┘  └─────────────┘  └─────────────┘              │ │   │
-│  │  └─────────────────────────────────────────────────────────────────┘ │   │
-│  │                                  │                                    │   │
-│  │  ┌─────────────────────────────────▼─────────────────────────────────┐ │   │
-│  │  │                      Data Access Layer                           │ │   │
-│  │  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐              │ │   │
-│  │  │  │   Coctel    │  │ Categories  │  │   Recipe    │              │ │   │
-│  │  │  │ Repository  │  │ Repository  │  │ Repository  │              │ │   │
-│  │  │  └─────────────┘  └─────────────┘  └─────────────┘              │ │   │
-│  │  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐              │ │   │
-│  │  │  │    User     │  │Ingredients  │  │Notification │              │ │   │
-│  │  │  │ Repository  │  │ Repository  │  │ Repository  │              │ │   │
-│  │  │  └─────────────┘  └─────────────┘  └─────────────┘              │ │   │
-│  │  └─────────────────────────────────────────────────────────────────┘ │   │
-│  └──────────────────────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────┬───────────────────────────────────────┘
-                                          │
-                                          ▼
-                              ┌─────────────────────┐
-                              │   Database SQLite   │
-                              │                     │
-                              │ ┌─────────────────┐ │
-                              │ │   cocktails     │ │
-                              │ │   categories    │ │
-                              │ │   ingredients   │ │
-                              │ │   recipes       │ │
-                              │ │   users         │ │
-                              │ │ notifications   │ │
-                              │ │preparation_hist │ │
-                              │ └─────────────────┘ │
-                              └─────────────────────┘
-```
+<div align="center">
+  <img src="../../../Documentación/Diagramas/digrama_arquitectura_general.png" alt="Arquitectura ZFCocteles" width="600" />
+</div>
 
-## 🔄 Comunicación entre Procesos (IPC)
+## 🏗️ CAPAS ARQUITECTURALES DETALLADAS
 
-```
-React Component ──invoke──► Preload ──invoke──► Main Process ──SQL──► SQLite
-      ▲                          │                    │                    │
-      │                          │                    ▼                    ▼
-   UI Update ◄──response─────response──response──Repository Pattern──Query Result
-```
+### 📊 1. CAPA DE DATOS
 
-### Flujo de Datos Detallado:
-
-1. **React Component** → `window.electronAPI.getCocktails()`
-2. **Preload Script** → `ipcRenderer.invoke('get-cocktails')`
-3. **Main Process** → `ipcMain.handle('get-cocktails', handler)`
-4. **Repository** → `coctelRepository.getAll()`
-5. **SQLite** → Ejecuta consulta y retorna datos
-6. **Response** ← ← ← ← De vuelta a React
-
-## 📦 Arquitectura por Capas
-
-### **🖥️ Main Process** (`src/main/`)
-
-#### **Core Files:**
-
-- **main.js** → Entry point, window management, IPC setup
-- **preload.js** → Secure bridge entre main y renderer
-
-#### **Database Layer** (`src/main/db/`):
-
-- **database.js** → SQLite connection & schema initialization
-- **schema_sqlite.sql** → Complete database schema
-- **index.js** → Repository exports & initialization
-
-#### **Repository Pattern:**
-
-- **coctelRepository.js** → Cocktail CRUD & business queries
-- **categoryRepository.js** → Category management & relationships
-- **ingredientRepository.js** → Ingredient management & statistics
-- **recipeRepository.js** → Recipe steps & ingredients management
-- **userRepository.js** → User authentication & preferences
-- **notificationRepository.js** → Notification system
-
-### **⚛️ Renderer Process** (`src/renderer/`)
-
-#### **UI Layer** (`components/`):
-
-```
-components/
-├── layout/
-│   ├── Header.jsx        → Top navigation bar
-│   ├── Sidebar.jsx       → Main menu navigation
-│   ├── MainContent.jsx   → Content wrapper
-│   └── Footer.jsx        → Bottom bar
-├── common/              → Reusable UI components
-├── cocteles/           → Cocktail-specific components
-└── icons/              → SVG icon components
-```
-
-#### **Pages** (`pages/`):
-
-- **CatalogoPage.jsx** → Cocktail catalog & search
-- **CategoriasPage.jsx** → Category management
-- **CrearPage.jsx** → Create new cocktails
-- **ManualPage.jsx** → User guides & tutorials
-- **HistorialPage.jsx** → Preparation history
-- **AjustesPage.jsx** → App settings
-- **NotificacionesPage.jsx** → Notification center
-- **UsuarioPage.jsx** → User profile & stats
-
-#### **State Management** (`context/`):
-
-- **NavigationContext.jsx** → Global navigation state
-
-#### **Business Logic** (`services/`, `controllers/`, `hooks/`):
-
-- Domain-specific logic and React state management
-
-## 🗃️ Base de Datos (SQLite)
-
-### **Esquema Completo:**
+#### 🗄️ Base de Datos SQLite Normalizada
 
 ```sql
--- Tabla principal de cócteles
+-- Esquema moderno con constraints y relaciones
 CREATE TABLE cocktails (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL,
-  description TEXT,
-  difficulty TEXT CHECK(difficulty IN ('fácil', 'medio', 'difícil')),
-  preparation_time INTEGER,
-  alcohol_content REAL,
-  image_url TEXT,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  difficulty TEXT CHECK(difficulty IN ('fácil', 'difícil')) NOT NULL,
+  preparation_time INTEGER NOT NULL,
+  id_owner INTEGER REFERENCES users(id),
+  UNIQUE(name, id_owner)
 );
 
--- Categorías del sistema y personalizadas
+-- Sistema de categorías flexible
 CREATE TABLE categories (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  name TEXT UNIQUE NOT NULL,
-  description TEXT,
-  color TEXT,
-  icon TEXT,
-  is_system BOOLEAN DEFAULT 0,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-
--- Ingredientes con tipos y información nutricional
-CREATE TABLE ingredients (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  name TEXT UNIQUE NOT NULL,
-  type TEXT CHECK(type IN ('esencial', 'garnish', 'opcional')),
-  category TEXT,
-  alcohol_content REAL DEFAULT 0,
-  description TEXT,
-  image_url TEXT,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-
--- Recetas base por cóctel
-CREATE TABLE recipes (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  id_cocktail INTEGER UNIQUE NOT NULL,
-  glass_type TEXT,
-  garnish TEXT,
-  serving_suggestion TEXT,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (id_cocktail) REFERENCES cocktails(id) ON DELETE CASCADE
-);
-
--- Pasos detallados de preparación
-CREATE TABLE recipe_steps (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  id_recipe INTEGER NOT NULL,
-  step_number INTEGER NOT NULL,
-  instruction TEXT NOT NULL,
-  duration INTEGER,
-  is_critical BOOLEAN DEFAULT 0,
-  FOREIGN KEY (id_recipe) REFERENCES recipes(id) ON DELETE CASCADE
-);
-
--- Ingredientes específicos por receta
-CREATE TABLE recipe_ingredients (
-  id_recipe INTEGER NOT NULL,
-  id_ingredient INTEGER NOT NULL,
-  quantity REAL NOT NULL,
-  unit TEXT NOT NULL,
-  preparation_note TEXT,
-  is_optional BOOLEAN DEFAULT 0,
-  order_index INTEGER DEFAULT 0,
-  PRIMARY KEY (id_recipe, id_ingredient),
-  FOREIGN KEY (id_recipe) REFERENCES recipes(id) ON DELETE CASCADE,
-  FOREIGN KEY (id_ingredient) REFERENCES ingredients(id)
-);
-
--- Relación muchos a muchos: cócteles ↔ categorías
-CREATE TABLE cocktail_categories (
-  id_cocktail INTEGER NOT NULL,
-  id_category INTEGER NOT NULL,
-  PRIMARY KEY (id_cocktail, id_category),
-  FOREIGN KEY (id_cocktail) REFERENCES cocktails(id) ON DELETE CASCADE,
-  FOREIGN KEY (id_category) REFERENCES categories(id) ON DELETE CASCADE
-);
-
--- Usuarios del sistema
-CREATE TABLE users (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL,
-  email TEXT UNIQUE NOT NULL,
-  password_hash TEXT NOT NULL,
-  preferences TEXT DEFAULT '{}',
-  experience_level TEXT DEFAULT 'principiante',
-  age INTEGER,
-  active BOOLEAN DEFAULT 1,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  type TEXT CHECK(type IN ('system', 'personal')) NOT NULL,
+  color TEXT DEFAULT '#e2e8f0'
 );
 
--- Historial de preparaciones por usuario
-CREATE TABLE user_cocktail_history (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  id_user INTEGER NOT NULL,
-  id_cocktail INTEGER NOT NULL,
-  preparation_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-  rating INTEGER CHECK(rating BETWEEN 1 AND 5),
-  notes TEXT,
-  duration INTEGER,
-  success BOOLEAN DEFAULT 1,
-  FOREIGN KEY (id_user) REFERENCES users(id) ON DELETE CASCADE,
-  FOREIGN KEY (id_cocktail) REFERENCES cocktails(id)
-);
-
--- Sistema de notificaciones
-CREATE TABLE notifications (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  id_user INTEGER NOT NULL,
-  type TEXT NOT NULL CHECK(type IN ('info', 'warning', 'success', 'error', 'achievement', 'reminder', 'new_cocktail', 'system')),
-  title TEXT NOT NULL,
-  message TEXT NOT NULL,
-  data TEXT DEFAULT '{}',
-  read_at DATETIME,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  scheduled_for DATETIME,
-  priority TEXT DEFAULT 'normal' CHECK(priority IN ('low', 'normal', 'high')),
-  expires_at DATETIME,
-  FOREIGN KEY (id_user) REFERENCES users(id) ON DELETE CASCADE
+-- Relación muchos-a-muchos optimizada
+CREATE TABLE cocktail_categories (
+  cocktail_id INTEGER REFERENCES cocktails(id) ON DELETE CASCADE,
+  category_id INTEGER REFERENCES categories(id) ON DELETE CASCADE,
+  PRIMARY KEY(cocktail_id, category_id)
 );
 ```
 
-## 🎨 Patrones de Diseño Implementados
-
-### **🗄️ Repository Pattern**
-
-Encapsula toda la lógica de acceso a datos:
+#### 🔧 Repository Pattern
 
 ```javascript
-// Ejemplo: CoctelRepository
-const CoctelRepository = {
-  // CRUD básico
-  create: cocktailData => {
-    /* INSERT logic */
-  },
-  getById: id => {
-    /* SELECT with JOINs */
-  },
-  getAll: filters => {
-    /* Complex queries */
-  },
-  update: (id, data) => {
-    /* UPDATE with validation */
-  },
-  delete: id => {
-    /* CASCADE delete */
-  },
+// BaseRepository - Patrón reutilizable
+class BaseRepository {
+  constructor(tableName, primaryKey = 'id') {
+    this.tableName = tableName;
+    this.primaryKey = primaryKey;
+    this.db = getDatabase();
+  }
 
-  // Métodos específicos de dominio
-  getWithRecipe: id => {
-    /* Complex JOIN query */
-  },
-  searchByIngredients: ingredients => {
-    /* Advanced search */
-  },
-  getMostPopular: () => {
-    /* Statistics query */
-  },
-  addToFavorites: (userId, cocktailId) => {
-    /* M:N relationship */
-  },
-};
+  findAll() {
+    /* SQL query with prepared statements */
+  }
+  findById(id) {
+    /* Parameterized query */
+  }
+  create(data) {
+    /* Insert with validation */
+  }
+  update(id, data) {
+    /* Update with constraints */
+  }
+  delete(id) {
+    /* Cascade delete handling */
+  }
+}
+
+// Repositorios especializados heredan funcionalidad
+class CocktailRepository extends BaseRepository {
+  constructor() {
+    super('cocktails', 'id');
+  }
+
+  // Métodos específicos del dominio
+  findByUserId(userId) {
+    /* Usuario-specific queries */
+  }
+  findFeatured() {
+    /* Complex joins with categories */
+  }
+  searchByIngredients(ingredients) {
+    /* Advanced filtering */
+  }
+}
 ```
 
-### **🔧 Builder Pattern**
+### ⚡ 2. CAPA DE ESTADO Y CONTEXTO
 
-Para construcción fluida de entidades complejas:
+#### 🎛️ Context Pattern con React
+
+```javascript
+// NavigationContext - Estado global de navegación
+const NavigationContext = createContext();
+
+export function NavigationProvider({ children }) {
+  const [currentPage, setCurrentPage] = useState('catalog');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  return (
+    <NavigationContext.Provider
+      value={{
+        currentPage,
+        setCurrentPage,
+        sidebarOpen,
+        setSidebarOpen,
+      }}
+    >
+      {children}
+    </NavigationContext.Provider>
+  );
+}
+```
+
+### 🧠 3. CAPA DE LÓGICA DE NEGOCIO
+
+#### 🔄 Services y Hooks Personalizados
+
+```javascript
+// Hook personalizado para cócteles
+export function useCocktails() {
+  const [cocktails, setCocktails] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const loadCocktails = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await window.electronAPI.getCocktails();
+      setCocktails(data);
+    } catch (error) {
+      console.error('Error loading cocktails:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  return { cocktails, loading, loadCocktails };
+}
+```
+
+#### 🎯 Builder Pattern para Modelos
+
+```javascript
+// CocktailBuilder - Construcción fluida de objetos
+class CocktailBuilder {
+  constructor() {
+    this.cocktail = {};
+  }
+
+  withName(name) {
+    this.cocktail.name = name;
+    return this;
+  }
+
+  withDifficulty(difficulty) {
+    this.cocktail.difficulty = difficulty;
+    return this;
+  }
+
+  withPreparationTime(time) {
+    this.cocktail.preparation_time = time;
+    return this;
+  }
+
+  build() {
+    // Validación antes de crear
+    if (!this.cocktail.name) throw new Error('Name is required');
+    return this.cocktail;
+  }
+}
+
+// Uso: new CocktailBuilder().withName('Mojito').withDifficulty('fácil').build()
+```
+
+### 🎨 4. CAPA DE PRESENTACIÓN
+
+#### 🧩 Componentes Modulares
+
+```
+src/renderer/components/
+├── common/           # Componentes reutilizables
+│   ├── Button.jsx
+│   ├── Input.jsx
+│   └── Modal.jsx
+├── cocteles/        # Componentes específicos de cócteles
+│   ├── CocktailCard.jsx
+│   ├── CocktailForm.jsx
+│   └── CocktailList.jsx
+├── layout/          # Componentes de estructura
+│   ├── Header.jsx
+│   ├── Sidebar.jsx
+│   └── MainLayout.jsx
+└── icons/           # Iconos SVG componentes
+```
+
+## 🔄 COMUNICACIÓN ENTRE PROCESOS (IPC) - SEGURA
+
+### 🌉 Flujo de Datos Seguro
+
+<div align="center">
+  <img src="../../../Documentación/Diagramas/diagrama_comunicacion_IPC.png" alt="IPC Secure Bridge" width="500" />
+</div>
+
+### 🔒 API Segura Expuesta
+
+```javascript
+// preload.js - Bridge seguro
+const { contextBridge, ipcRenderer } = require('electron');
+
+contextBridge.exposeInMainWorld('electronAPI', {
+  // Cócteles
+  getCocktails: () => ipcRenderer.invoke('get-cocktails'),
+  createCocktail: data => ipcRenderer.invoke('create-cocktail', data),
+  updateCocktail: (id, data) => ipcRenderer.invoke('update-cocktail', id, data),
+
+  // Categorías
+  getCategories: () => ipcRenderer.invoke('get-categories'),
+  addToCategory: (cocktailId, categoryId) =>
+    ipcRenderer.invoke('add-to-category', cocktailId, categoryId),
+
+  // Usuario
+  getCurrentUser: () => ipcRenderer.invoke('get-current-user'),
+
+  // Notificaciones
+  showNotification: message => ipcRenderer.invoke('show-notification', message),
+});
+```
+
+## 📚 PATRONES DE DISEÑO IMPLEMENTADOS
+
+### 🏭 1. Repository Pattern
+
+- **Propósito**: Abstrae acceso a datos
+- **Beneficio**: Código desacoplado y testeable
+- **Implementación**: `BaseRepository` + especializaciones
+
+### 🏗️ 2. Builder Pattern
+
+- **Propósito**: Construcción fluida de objetos complejos (crear cócteles, recetas, etc.)
+- **Beneficio**: API intuitiva y validación centralizada
+- **Implementación**: `CocktailBuilder`, `RecipeBuilder`
+- **Ejemplo**:
 
 ```javascript
 const mojito = new CoctelBuilder()
@@ -353,120 +261,129 @@ const mojito = new CoctelBuilder()
   .build();
 ```
 
-### **🔄 Context Pattern (React)**
+### 🔄 3. Singleton Pattern
 
-Para gestión de estado global:
+- **Propósito**: Una instancia de conexión a BD
+- **Beneficio**: Optimización de recursos
+- **Implementación**: Database connection manager (`db/`)
 
-```javascript
-// NavigationContext.jsx
-const NavigationContext = createContext();
+### 📡 4. Observer Pattern
 
-export const NavigationProvider = ({ children }) => {
-  const [currentPage, setCurrentPage] = useState('catalogo');
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+- **Propósito**: Reactividad en la UI
+- **Beneficio**: Estado sincronizado automáticamente
+- **Implementación**: React Context + useState
 
-  const value = {
-    currentPage,
-    setCurrentPage,
-    sidebarCollapsed,
-    setSidebarCollapsed,
-    searchQuery,
-    setSearchQuery,
-    navigate: page => setCurrentPage(page),
-  };
+### 🎯 5. Strategy Pattern
 
-  return <NavigationContext.Provider value={value}>{children}</NavigationContext.Provider>;
-};
-```
+- **Propósito**: Algoritmos intercambiables
+- **Beneficio**: Flexibilidad en búsquedas y filtros
+- **Implementación**: Search strategies, sort strategies
 
-### **🏭 Factory Pattern**
+## 🚀 CARACTERÍSTICAS TÉCNICAS AVANZADAS
 
-Para creación consistente de entidades:
+### ⚡ Performance
 
-```javascript
-class NotificationFactory {
-  static createAchievement(userId, achievementData) {
-    return {
-      id_user: userId,
-      type: 'achievement',
-      title: '¡Logro desbloqueado!',
-      message: achievementData.message,
-      priority: 'high',
-      data: JSON.stringify(achievementData),
-    };
-  }
+- **Prepared Statements** para todas las consultas SQL - Implementado ✅
+  Mejora la seguridad y velocidad de las consultas.
+- **Índices optimizados** en columnas de búsqueda frecuente (ej. `name`, `difficulty`) - Implementado ✅
+  Mejora la velocidad de búsqueda y filtrado.
+- **Lazy loading** de imágenes y componentes - No Implementado ❌, Prioridad media 🔧
+  Carga diferida de recursos para mejorar el tiempo de carga inicial.
+- **React.memo** para prevenir re-renders innecesarios - No Implementado ❌, Prioridad alta 🔥
+  Optimiza el rendimiento de componentes pesados.
 
-  static createReminder(userId, reminderData) {
-    return {
-      id_user: userId,
-      type: 'reminder',
-      title: reminderData.title,
-      message: reminderData.message,
-      scheduled_for: reminderData.scheduledFor,
-      expires_at: reminderData.expiresAt,
-    };
-  }
-}
-```
+### 🔒 Seguridad
 
-## 🚀 Características de la Arquitectura
+- **SQL Injection Prevention** con parámetros - Implementado ✅
+  Uso de consultas parametrizadas para evitar inyecciones SQL.
+- **Input Validation** en múltiples capas - Parcialmente Implementado 🔄
+  Validación de datos en el frontend y backend.
+  TODO: Implementar validación completa en todos los puntos de entrada (ej. formularios, API).
+- **Secure IPC** con contextBridge - Implementado ✅
+  Exposición segura de la API de Electron al renderer.
+- **Data Sanitization** antes de almacenar - No Implementado ❌ - Prioridad alta 🔥
+  Sanitización de datos de entrada para prevenir XSS y otros ataques.
 
-### **✅ Ventajas de la Arquitectura Monolítica:**
+### 🧪 Testabilidad
 
-- **Simplicidad de desarrollo**: Todo en una aplicación
-- **Fácil debugging**: Un solo proceso de despliegue
-- **Performance**: No latencia de red entre servicios
-- **Transacciones ACID**: SQLite garantiza consistencia
-- **Distribución simple**: Un solo ejecutable
+- **Repository Pattern** permite mocking fácil - Implementado ✅
+  Facilita pruebas unitarias y de integración.
+- **Dependency Injection** en servicios - No Implementado ❌ - Prioridad baja 📋
+  Mejora la testabilidad al permitir inyectar dependencias.
+- **Unit Tests** para lógica de negocio - No Implementado ❌ - Prioridad alta 🔥
+  Pruebas unitarias para funciones y servicios críticos.
+- **Integration Tests** para IPC - No Implementado ❌ - Prioridad alta 🔥
+  Pruebas de integración para asegurar la comunicación entre procesos.
 
-### **✅ Separación de Responsabilidades:**
+### 📦 Maintainabilidad
 
-- **Main Process**: Sistema operativo, seguridad, base de datos
-- **Renderer Process**: UI, interacciones de usuario, estado
-- **Repository Layer**: Acceso a datos, consultas complejas
-- **Context Layer**: Estado global, navegación
-- **Component Layer**: UI reutilizable, presentación
+- **Separation of Concerns** clara entre capas - Implementado ✅
+  Cada capa tiene responsabilidades bien definidas.
+- **Single Responsibility** en cada clase/función - Implementado ✅
+  Cada clase o función tiene una única responsabilidad.
+- **Clean Code** con naming conventions - Implementado ✅
+  Código legible y mantenible.
+- **Documentation** inline y externa - Implementado ✅
+  Comentarios claros y documentación técnica.
 
-### **✅ Escalabilidad:**
+## 🎯 VENTAJAS DE ESTA ARQUITECTURA
 
-- **Modular**: Fácil agregar nuevos repositorios/servicios
-- **Extensible**: Nuevas funcionalidades sin refactoring
-- **Mantenible**: Patrones consistentes en todo el código
-- **Testeable**: Cada capa puede testearse independientemente
+### ✅ Para el Desarrollo
 
-## 🔧 Tecnologías Principales
+1. **Productividad**: Patrones claros y reutilizables
+2. **Debugging**: Errores fáciles de localizar
+3. **Testing**: Componentes aislados y testeables
+4. **Colaboración**: Estructura comprensible para todo el equipo
 
-- **Electron** → Desktop app framework
-- **React 19** → UI library with latest features
-- **Vite** → Fast build tool and dev server
-- **SQLite + better-sqlite3** → Embedded database
-- **Tailwind CSS** → Utility-first CSS framework
-- **ESLint + Prettier** → Code quality and formatting
+### ✅ Para el Mantenimiento
 
-## 📋 Páginas y Funcionalidades
+1. **Escalabilidad**: Fácil agregar nuevas funcionalidades
+2. **Refactoring**: Cambios sin romper dependencias
+3. **Performance**: Optimizaciones localizadas
+4. **Documentation**: Auto-documentada por la estructura
 
-### **🍹 Páginas Principales:**
+### ✅ Para la Calidad
 
-1. **Catálogo** → Búsqueda y visualización de cócteles
-2. **Categorías** → Gestión de favoritos y categorías personalizadas
-3. **Crear** → Formulario de creación de nuevos cócteles
-4. **Manual** → Guías, tutoriales y tips
-5. **Historial** → Registro de preparaciones y estadísticas
-6. **Ajustes** → Configuración de la aplicación
-7. **Notificaciones** → Centro de notificaciones y logros
-8. **Usuario** → Perfil, preferencias y estadísticas personales
-
-### **🔍 Funcionalidades Avanzadas:**
-
-- **Búsqueda inteligente** por nombre, ingredientes, dificultad
-- **Sistema de favoritos** y categorías personalizadas
-- **Historial de preparaciones** con ratings y notas
-- **Notificaciones automáticas** de logros y recordatorios
-- **Estadísticas de usuario** y nivel de experiencia
-- **Recetas detalladas** con pasos e ingredientes específicos
-- **Gestión de ingredientes** con información nutricional
+1. **Robustez**: Múltiples capas de validación
+2. **Consistencia**: Patrones uniformes en todo el código
+3. **Seguridad**: Validación y sanitización sistemática
+4. **Usabilidad**: Separación clara UI/Lógica
 
 ---
+
+**Esta arquitectura representa el estado del arte en desarrollo Electron moderno, combinando las mejores prácticas de ingeniería de software con tecnologías cutting-edge.**
+
+#### UI Layer (`components/`):
+
+```
+components/
+├── layout/
+│   ├── Header.jsx        → Top navigation bar
+│   ├── Sidebar.jsx       → Main menu navigation
+│   ├── MainContent.jsx   → Content wrapper
+│   └── Footer.jsx        → Bottom bar
+├── common/              → Reusable UI components
+├── cocteles/           → Cocktail-specific components
+└── icons/              → SVG icon components
+```
+
+#### Pages (`pages/`):
+
+- **CatalogoPage.jsx** → Cocktail catalog & search
+- **CategoriasPage.jsx** → Category management
+- **CrearPage.jsx** → Create new cocktails
+- **ManualPage.jsx** → User guides & tutorials
+- **HistorialPage.jsx** → Preparation history
+- **AjustesPage.jsx** → App settings
+- **NotificacionesPage.jsx** → Notification center
+- **UsuarioPage.jsx** → User profile & stats
+
+#### State Management (`context/`):
+
+- **NavigationContext.jsx** → Global navigation state
+
+#### Business Logic (`services/`, `controllers/`, `hooks/`):
+
+- Domain-specific logic and React state management
 
 **🏗️ Arquitectura robusta, escalable y mantenible para la gestión completa de cócteles** 🍹✨

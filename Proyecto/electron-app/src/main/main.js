@@ -8,6 +8,7 @@ import { initializeDatabase } from './db/config/database.js';
 // Repositories
 import {
   cocktailRepository,
+  // TODO: Uncomment when needed
   // categoryRepository,
   // favoriteRepository,
   // ingredientRepository,
