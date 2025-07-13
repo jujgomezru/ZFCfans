@@ -145,23 +145,23 @@ CREATE TABLE IF NOT EXISTS user_settings (
     updated_at TEXT DEFAULT (datetime('now'))
 );
 
--- Índices para optimizar consultas
-CREATE INDEX idx_cocktails_difficulty ON cocktails(difficulty);
-CREATE INDEX idx_cocktails_category ON cocktails(id_category);
-CREATE INDEX idx_cocktails_owner ON cocktails(id_owner);
-CREATE INDEX idx_preparation_history_user ON preparation_history(id_user);
-CREATE INDEX idx_preparation_history_date ON preparation_history(preparation_date);
-CREATE INDEX idx_notifications_user_unread ON notifications(id_user, is_read);
-CREATE INDEX idx_recipe_steps_recipe ON recipe_steps(id_recipe, step_number);
+-- Índices para optimizar consultas (con protección contra duplicación)
+CREATE INDEX IF NOT EXISTS idx_cocktails_difficulty ON cocktails(difficulty);
+CREATE INDEX IF NOT EXISTS idx_cocktails_category ON cocktails(id_category);
+CREATE INDEX IF NOT EXISTS idx_cocktails_owner ON cocktails(id_owner);
+CREATE INDEX IF NOT EXISTS idx_preparation_history_user ON preparation_history(id_user);
+CREATE INDEX IF NOT EXISTS idx_preparation_history_date ON preparation_history(preparation_date);
+CREATE INDEX IF NOT EXISTS idx_notifications_user_unread ON notifications(id_user, is_read);
+CREATE INDEX IF NOT EXISTS idx_recipe_steps_recipe ON recipe_steps(id_recipe, step_number);
 
--- Insertar categorías del sistema por defecto
-INSERT INTO categories (name, description, color, is_system) VALUES
+-- Insertar categorías del sistema por defecto (con protección contra duplicación)
+INSERT OR IGNORE INTO categories (name, description, color, is_system) VALUES
     ('Favoritos', 'Cócteles marcados como favoritos', '#FCD34D', 1),
     ('Recientes', 'Cócteles preparados recientemente', '#60A5FA', 1),
     ('Por Probar', 'Cócteles pendientes de preparar', '#A78BFA', 1);
 
 -- Insertar algunos maridajes básicos
-INSERT INTO pairings (name, description) VALUES
+INSERT OR IGNORE INTO pairings (name, description) VALUES
     ('Aperitivo', 'Ideal para abrir el apetito'),
     ('Digestivo', 'Perfecto después de las comidas'),
     ('Cóctel de tarde', 'Para disfrutar en reuniones sociales'),
@@ -169,7 +169,7 @@ INSERT INTO pairings (name, description) VALUES
     ('Celebración', 'Para ocasiones especiales');
 
 -- Insertar algunos ingredientes básicos
-INSERT INTO ingredients (name, type, category, alcohol_content) VALUES
+INSERT OR IGNORE INTO ingredients (name, type, category, alcohol_content) VALUES
     ('Ron blanco', 'esencial', 'alcohol', 40.0),
     ('Ron oscuro', 'esencial', 'alcohol', 40.0),
     ('Vodka', 'esencial', 'alcohol', 40.0),
