@@ -1,0 +1,264 @@
+// ZFC Cócteles - Esquema de Base de Datos
+// Generado para visualización de diagramas ER
+
+Project ZFCCocteles {
+  database_type: 'SQLite'
+  Note: '''
+    # ZFC Cócteles Database Schema
+    Sistema de gestión de cócteles con funcionalidades avanzadas:
+    - Gestión de usuarios y categorías personalizadas
+    - Recetas detalladas con pasos e ingredientes
+    - Historial de preparación con métricas
+    - Sistema de notificaciones
+    - Configuración personalizable
+  '''
+}
+
+// ================================
+// ENTIDADES PRINCIPALES
+// ================================
+
+Table users {
+  id integer [primary key, increment, note: 'ID único del usuario']
+  username text [unique, not null, note: 'Nombre de usuario único']
+  email text [unique, not null, note: 'Email único para login']
+  password text [not null, note: 'Contraseña encriptada']
+  created_at text [default: `datetime('now')`, note: 'Fecha de registro']
+  updated_at text [default: `datetime('now')`, note: 'Última actualización']
+
+  Note: 'Usuarios del sistema - pueden crear cócteles y categorías'
+}
+
+Table categories {
+  id integer [primary key, increment]
+  name text [unique, not null, note: 'Nombre único de la categoría']
+  description text [note: 'Descripción opcional']
+  color text [default: '#6B7280', note: 'Color hexadecimal para la UI']
+  is_system integer [default: 0, note: '1=categoría del sistema (Favoritos, Recientes), 0=personalizada']
+  id_owner integer [ref: > users.id, note: 'Usuario creador (NULL para categorías del sistema)']
+  created_at text [default: `datetime('now')`]
+  updated_at text [default: `datetime('now')`]
+
+  Note: '''
+    Categorías de cócteles - pueden ser:
+    - Sistema: Favoritos, Recientes, Por Probar
+    - Personalizadas: Creadas por usuarios
+  '''
+}
+
+Table pairings {
+  id integer [primary key, increment]
+  name text [not null, note: 'Nombre del maridaje']
+  description text [note: 'Descripción del tipo de ocasión']
+  created_at text [default: `datetime('now')`]
+
+  Note: 'Tipos de maridaje: Aperitivo, Digestivo, Celebración, etc.'
+}
+
+Table cocktails {
+  id integer [primary key, increment]
+  name text [unique, not null, note: 'Nombre único del cóctel']
+  img_url text [note: 'URL de la imagen del cóctel']
+  difficulty text [not null, note: 'Dificultad: fácil, media, difícil']
+  description text [note: 'Descripción del cóctel']
+  additional_notes text [note: 'Notas adicionales']
+  preparation_time integer [note: 'Tiempo estimado en minutos']
+  servings integer [default: 1, note: 'Número de porciones']
+  alcohol_content real [note: 'Porcentaje de alcohol']
+  is_featured integer [default: 0, note: '1=destacado en la app, 0=normal']
+  id_owner integer [ref: > users.id, note: 'Usuario creador']
+  id_pairing integer [ref: > pairings.id, note: 'Maridaje principal']
+  id_category integer [ref: > categories.id, note: 'Categoría principal']
+  created_at text [default: `datetime('now')`]
+  updated_at text [default: `datetime('now')`]
+
+  Note: '''
+    Entidad central del sistema.
+    Puede estar en múltiples categorías via cocktail_categories
+  '''
+}
+
+// ================================
+// RECETAS Y PREPARACIÓN
+// ================================
+
+Table recipes {
+  id integer [primary key, increment]
+  id_cocktail integer [unique, not null, ref: - cocktails.id, note: 'Relación 1:1 con cóctel']
+  glass_type text [note: 'Tipo de vaso: highball, martini, rocks, etc.']
+  garnish text [note: 'Decoración: rodaja de lima, cereza, etc.']
+  serving_suggestion text [note: 'Sugerencias de servido']
+  created_at text [default: `datetime('now')`]
+  updated_at text [default: `datetime('now')`]
+
+  Note: 'Recetas - información de preparación y presentación'
+}
+
+Table recipe_steps {
+  id integer [primary key, increment]
+  id_recipe integer [not null, ref: > recipes.id, note: 'Receta a la que pertenece']
+  step_number integer [not null, note: 'Número de paso (1, 2, 3...)']
+  instruction text [not null, note: 'Instrucción detallada del paso']
+  duration integer [note: 'Tiempo estimado del paso en segundos']
+  is_critical integer [default: 0, note: '1=paso crítico, 0=opcional']
+  created_at text [default: `datetime('now')`]
+
+  Note: 'Pasos ordenados de preparación - permite instrucciones detalladas'
+}
+
+Table ingredients {
+  id integer [primary key, increment]
+  name text [unique, not null, note: 'Nombre único del ingrediente']
+  type text [not null, note: 'Tipo: esencial, opcional']
+  category text [note: 'Categoría: alcohol, mixer, fruta, hierba, etc.']
+  description text [note: 'Descripción del ingrediente']
+  alcohol_content real [default: 0, note: 'Porcentaje de alcohol (0 para no alcohólicos)']
+  created_at text [default: `datetime('now')`]
+
+  Note: 'Ingredientes base - sin cantidades (esas van en recipe_ingredients)'
+}
+
+// ================================
+// RELACIONES N:M
+// ================================
+
+Table recipe_ingredients {
+  id_recipe integer [not null, ref: > recipes.id, note: 'Receta']
+  id_ingredient integer [not null, ref: > ingredients.id, note: 'Ingrediente']
+  quantity real [not null, note: 'Cantidad numérica (50, 30, 2...)']
+  unit text [not null, note: 'Unidad: ml, oz, cucharadas, gotas, etc.']
+  preparation_note text [note: 'Preparación: machacado, en cubos, exprimido, etc.']
+  is_optional integer [default: 0, note: '1=opcional en esta receta, 0=obligatorio']
+  order_index integer [default: 0, note: 'Orden de agregado en la receta']
+
+  indexes {
+    (id_recipe, id_ingredient) [pk]
+  }
+
+  Note: '''
+    Relación N:M ingredientes-recetas con detalles:
+    - Cantidad específica por receta
+    - Preparación específica
+    - Orden de agregado
+  '''
+}
+
+Table cocktail_categories {
+  id_cocktail integer [not null, ref: > cocktails.id, note: 'Cóctel']
+  id_category integer [not null, ref: > categories.id, note: 'Categoría']
+  added_at text [default: `datetime('now')`, note: 'Cuándo se agregó a la categoría']
+
+  indexes {
+    (id_cocktail, id_category) [pk]
+  }
+
+  Note: 'Relación N:M cócteles-categorías - un cóctel puede estar en múltiples categorías'
+}
+
+// ================================
+// HISTORIAL Y ANÁLISIS
+// ================================
+
+Table preparation_history {
+  id integer [primary key, increment]
+  id_user integer [not null, ref: > users.id, note: 'Usuario que preparó']
+  id_cocktail integer [not null, ref: > cocktails.id, note: 'Cóctel preparado']
+  preparation_date text [not null, default: `datetime('now')`, note: 'Fecha de preparación']
+  score integer [default: 0, note: 'Calificación 0-5 estrellas']
+  comment text [note: 'Comentario del usuario']
+  preparation_time integer [note: 'Tiempo REAL de preparación en minutos']
+  difficulty_experienced text [note: 'Dificultad PERCIBIDA: fácil, media, difícil']
+  would_make_again integer [default: 1, note: '1=sí lo repetiría, 0=no']
+  created_at text [default: `datetime('now')`]
+
+  Note: '''
+    Historial detallado de preparaciones:
+    - Captura experiencia real vs teórica
+    - Métricas para recomendaciones
+    - Análisis de mejora del usuario
+  '''
+}
+
+// ================================
+// SISTEMA DE NOTIFICACIONES
+// ================================
+
+Table notifications {
+  id integer [primary key, increment]
+  id_user integer [ref: > users.id, note: 'Usuario destinatario (NULL=notificación global)']
+  type text [not null, note: 'Tipo: actualizacion, advertencia, logro, recordatorio']
+  title text [not null, note: 'Título de la notificación']
+  message text [not null, note: 'Mensaje detallado']
+  is_read integer [default: 0, note: '1=leída, 0=no leída']
+  is_system integer [default: 0, note: '1=notificación del sistema, 0=personalizada']
+  related_cocktail_id integer [ref: > cocktails.id, note: 'Cóctel relacionado (opcional)']
+  created_at text [default: `datetime('now')`, note: 'Fecha de creación']
+  read_at text [note: 'Fecha de lectura']
+
+  Note: '''
+    Sistema de notificaciones:
+    - Actualizaciones de app
+    - Logros y recordatorios
+    - Advertencias de seguridad
+    - Notificaciones personalizadas
+  '''
+}
+
+// ================================
+// CONFIGURACIÓN
+// ================================
+
+Table user_settings {
+  id integer [primary key, increment]
+  id_user integer [unique, not null, ref: - users.id, note: 'Relación 1:1 con usuario']
+  theme text [default: 'light', note: 'Tema: light, dark, auto']
+  notifications_enabled integer [default: 1, note: '1=habilitadas, 0=deshabilitadas']
+  inventory_reminders integer [default: 1, note: '1=recordatorios de inventario activos']
+  default_serving_size integer [default: 1, note: 'Tamaño de porción por defecto']
+  preferred_units text [default: 'ml', note: 'Unidades preferidas: ml, oz']
+  created_at text [default: `datetime('now')`]
+  updated_at text [default: `datetime('now')`]
+
+  Note: 'Configuración personalizada por usuario'
+}
+
+// ================================
+// ÍNDICES PARA PERFORMANCE
+// ================================
+
+// Índices principales para optimización de consultas
+// CREATE INDEX idx_cocktails_difficulty ON cocktails(difficulty);
+// CREATE INDEX idx_cocktails_category ON cocktails(id_category);
+// CREATE INDEX idx_cocktails_owner ON cocktails(id_owner);
+// CREATE INDEX idx_preparation_history_user ON preparation_history(id_user);
+// CREATE INDEX idx_preparation_history_date ON preparation_history(preparation_date);
+// CREATE INDEX idx_notifications_user_unread ON notifications(id_user, is_read);
+// CREATE INDEX idx_recipe_steps_recipe ON recipe_steps(id_recipe, step_number);
+
+// ================================
+// ENUMS Y CONSTRAINTS
+// ================================
+
+Enum difficulty_levels {
+  facil [note: 'Fácil de preparar']
+  media [note: 'Dificultad media']
+  dificil [note: 'Difícil - requiere experiencia']
+}
+
+Enum notification_types {
+  actualizacion [note: 'Nuevas versiones y características']
+  advertencia [note: 'Advertencias de seguridad']
+  logro [note: 'Logros y celebraciones']
+  recordatorio [note: 'Recordatorios de inventario']
+}
+
+Enum theme_options {
+  light [note: 'Tema claro']
+  dark [note: 'Tema oscuro']
+  auto [note: 'Automático según sistema']
+}
+
+Enum unit_preferences {
+  ml [note: 'Mililitros (métrico)']
+  oz [note: 'Onzas (imperial)']
+}
