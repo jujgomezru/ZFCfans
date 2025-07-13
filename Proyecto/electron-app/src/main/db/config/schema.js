@@ -2,7 +2,8 @@ export function initializeSchema(db) {
   db.pragma('foreign_keys = ON');
 
   // Usuarios
-  db.prepare(`
+  db.prepare(
+    `
     CREATE TABLE IF NOT EXISTS users (
       user_id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
@@ -10,10 +11,12 @@ export function initializeSchema(db) {
       password_hash TEXT NOT NULL,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
-  `).run();
+  `,
+  ).run();
 
   // Cócteles
-  db.prepare(`
+  db.prepare(
+    `
     CREATE TABLE IF NOT EXISTS cocktails (
       cocktail_id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
@@ -25,19 +28,23 @@ export function initializeSchema(db) {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (creator_user_id) REFERENCES users(user_id) ON DELETE CASCADE
     )
-  `).run();
+  `,
+  ).run();
 
   // Ingredientes
-  db.prepare(`
+  db.prepare(
+    `
     CREATE TABLE IF NOT EXISTS ingredients (
       ingredient_id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL UNIQUE,
       unit_type TEXT NOT NULL
     )
-  `).run();
+  `,
+  ).run();
 
   // Ingredientes de cócteles
-  db.prepare(`
+  db.prepare(
+    `
     CREATE TABLE IF NOT EXISTS cocktail_ingredients (
       cocktail_id INTEGER NOT NULL,
       ingredient_id INTEGER NOT NULL,
@@ -46,10 +53,12 @@ export function initializeSchema(db) {
       FOREIGN KEY (cocktail_id) REFERENCES cocktails(cocktail_id) ON DELETE CASCADE,
       FOREIGN KEY (ingredient_id) REFERENCES ingredients(ingredient_id) ON DELETE RESTRICT
     )
-  `).run();
+  `,
+  ).run();
 
   // Pasos
-  db.prepare(`
+  db.prepare(
+    `
     CREATE TABLE IF NOT EXISTS cocktail_steps (
       step_id INTEGER PRIMARY KEY AUTOINCREMENT,
       cocktail_id INTEGER NOT NULL,
@@ -58,10 +67,12 @@ export function initializeSchema(db) {
       UNIQUE (cocktail_id, step_number),
       FOREIGN KEY (cocktail_id) REFERENCES cocktails(cocktail_id) ON DELETE CASCADE
     )
-  `).run();
+  `,
+  ).run();
 
   // Imágenes
-  db.prepare(`
+  db.prepare(
+    `
     CREATE TABLE IF NOT EXISTS cocktail_images (
       image_id INTEGER PRIMARY KEY AUTOINCREMENT,
       cocktail_id INTEGER NOT NULL,
@@ -69,10 +80,12 @@ export function initializeSchema(db) {
       uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (cocktail_id) REFERENCES cocktails(cocktail_id) ON DELETE CASCADE
     )
-  `).run();
+  `,
+  ).run();
 
   // Categorías personalizadas
-  db.prepare(`
+  db.prepare(
+    `
     CREATE TABLE IF NOT EXISTS categories (
       category_id INTEGER PRIMARY KEY AUTOINCREMENT,
       user_id INTEGER NOT NULL,
@@ -81,10 +94,12 @@ export function initializeSchema(db) {
       UNIQUE (user_id, name),
       FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
     )
-  `).run();
+  `,
+  ).run();
 
   // Asociación cóctel ↔ categoría
-  db.prepare(`
+  db.prepare(
+    `
     CREATE TABLE IF NOT EXISTS cocktail_categories (
       cocktail_id INTEGER NOT NULL,
       category_id INTEGER NOT NULL,
@@ -92,10 +107,12 @@ export function initializeSchema(db) {
       FOREIGN KEY (cocktail_id) REFERENCES cocktails(cocktail_id) ON DELETE CASCADE,
       FOREIGN KEY (category_id) REFERENCES categories(category_id) ON DELETE CASCADE
     )
-  `).run();
+  `,
+  ).run();
 
   // Favoritos
-  db.prepare(`
+  db.prepare(
+    `
     CREATE TABLE IF NOT EXISTS favorites (
       user_id INTEGER NOT NULL,
       cocktail_id INTEGER NOT NULL,
@@ -104,10 +121,12 @@ export function initializeSchema(db) {
       FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
       FOREIGN KEY (cocktail_id) REFERENCES cocktails(cocktail_id) ON DELETE CASCADE
     )
-  `).run();
+  `,
+  ).run();
 
   // Historial de búsqueda
-  db.prepare(`
+  db.prepare(
+    `
     CREATE TABLE IF NOT EXISTS search_history (
       search_id INTEGER PRIMARY KEY AUTOINCREMENT,
       user_id INTEGER NOT NULL,
@@ -115,10 +134,12 @@ export function initializeSchema(db) {
       searched_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
     )
-  `).run();
+  `,
+  ).run();
 
   // Historial de preparaciones
-  db.prepare(`
+  db.prepare(
+    `
     CREATE TABLE IF NOT EXISTS preparation_history (
       prep_id INTEGER PRIMARY KEY AUTOINCREMENT,
       user_id INTEGER NOT NULL,
@@ -127,19 +148,23 @@ export function initializeSchema(db) {
       FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
       FOREIGN KEY (cocktail_id) REFERENCES cocktails(cocktail_id) ON DELETE SET NULL
     )
-  `).run();
+  `,
+  ).run();
 
   // Advertencias
-  db.prepare(`
+  db.prepare(
+    `
     CREATE TABLE IF NOT EXISTS warnings (
       warning_id INTEGER PRIMARY KEY AUTOINCREMENT,
       message TEXT NOT NULL,
       applies_to_alcoholic_only INTEGER NOT NULL DEFAULT 0
     )
-  `).run();
+  `,
+  ).run();
 
   // Asociación cóctel ↔ advertencia
-  db.prepare(`
+  db.prepare(
+    `
     CREATE TABLE IF NOT EXISTS cocktail_warnings (
       cocktail_id INTEGER NOT NULL,
       warning_id INTEGER NOT NULL,
@@ -147,12 +172,17 @@ export function initializeSchema(db) {
       FOREIGN KEY (cocktail_id) REFERENCES cocktails(cocktail_id) ON DELETE CASCADE,
       FOREIGN KEY (warning_id) REFERENCES warnings(warning_id) ON DELETE CASCADE
     )
-  `).run();
+  `,
+  ).run();
 
   // Índices útiles
   db.prepare(`CREATE INDEX IF NOT EXISTS idx_cocktails_name ON cocktails(name)`).run();
   db.prepare(`CREATE INDEX IF NOT EXISTS idx_cocktails_difficulty ON cocktails(difficulty)`).run();
   db.prepare(`CREATE INDEX IF NOT EXISTS idx_search_history_user ON search_history(user_id)`).run();
-  db.prepare(`CREATE INDEX IF NOT EXISTS idx_cocktail_images_cocktail_id ON cocktail_images(cocktail_id)`).run();
-  db.prepare(`CREATE INDEX IF NOT EXISTS idx_cocktail_steps_cocktail_id ON cocktail_steps(cocktail_id)`).run();
+  db.prepare(
+    `CREATE INDEX IF NOT EXISTS idx_cocktail_images_cocktail_id ON cocktail_images(cocktail_id)`,
+  ).run();
+  db.prepare(
+    `CREATE INDEX IF NOT EXISTS idx_cocktail_steps_cocktail_id ON cocktail_steps(cocktail_id)`,
+  ).run();
 }

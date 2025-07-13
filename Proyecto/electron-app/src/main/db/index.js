@@ -1,8 +1,17 @@
-import coctelRepository from './coctelRepository.js';
+// Configuración y base de datos
+export { default as database } from './config/database.js';
 
-// Re-exportar para mantener compatibilidad
-export default coctelRepository;
+// Repositories
+export {
+  cocktailRepository,
+  userRepository,
+  categoryRepository,
+  ingredientRepository,
+  favoriteRepository,
+} from './repositories/index.js';
 
-// También exportar individualmente si se necesita
-export { default as coctelRepository } from './coctelRepository.js';
-export { default as database } from './database.js';
+// Seeders
+export { runAllSeeders } from './seeders/index.js';
+
+// Exportación por defecto - ahora apunta directamente al CocktailRepository
+export { cocktailRepository as default } from './repositories/index.js';

@@ -4,16 +4,25 @@ export function insertarCoctelesIniciales(db) {
     return;
   }
 
+  // Asegurar que existe el usuario por defecto
+  const insertUser = db.prepare(`
+    INSERT OR IGNORE INTO users (user_id, name, email, password_hash)
+    VALUES (1, 'Usuario Demo', 'demo@example.com', 'demo_hash')
+  `);
+  insertUser.run();
+
   const cocktails = [
     {
       nombre: 'Aperol Spritz',
       categoria: 'aperitivo',
-      imagen: 'https://assets.tmecosys.com/image/upload/t_web_rdp_recipe_584x480/img/recipe/ras/Assets/3A602C62-7F02-4773-ACB2-7603622A3A19/Derivates/5133B835-49A1-4C2C-80EC-74E01842249C.jpg',
+      imagen:
+        'https://assets.tmecosys.com/image/upload/t_web_rdp_recipe_584x480/img/recipe/ras/Assets/3A602C62-7F02-4773-ACB2-7603622A3A19/Derivates/5133B835-49A1-4C2C-80EC-74E01842249C.jpg',
     },
     {
       nombre: 'Piña Colada',
       categoria: 'dulce',
-      imagen: 'https://assets.tmecosys.com/image/upload/t_web_rdp_recipe_584x480_1_5x/img/recipe/ras/Assets/A9467000-4182-4A69-802E-6A36234604C1/Derivates/9cca3d9b-727b-4d23-b633-71dcd23125da.jpg',
+      imagen:
+        'https://assets.tmecosys.com/image/upload/t_web_rdp_recipe_584x480_1_5x/img/recipe/ras/Assets/A9467000-4182-4A69-802E-6A36234604C1/Derivates/9cca3d9b-727b-4d23-b633-71dcd23125da.jpg',
     },
     {
       nombre: 'Manhattan',
