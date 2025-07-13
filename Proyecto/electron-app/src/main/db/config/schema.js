@@ -1,188 +1,88 @@
-export function initializeSchema(db) {
-  db.pragma('foreign_keys = ON');
+import { getDatabase } from './database.js';
 
-  // Usuarios
-  db.prepare(
-    `
-    CREATE TABLE IF NOT EXISTS users (
-      user_id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      email TEXT NOT NULL UNIQUE,
-      password_hash TEXT NOT NULL,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-  `,
-  ).run();
+/**
+ * Insertar datos de prueba para verificar el nuevo esquema
+ */
+export function insertSampleData() {
+  const db = getDatabase();
 
-  // Cócteles
-  db.prepare(
-    `
-    CREATE TABLE IF NOT EXISTS cocktails (
-      cocktail_id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      description TEXT,
-      difficulty INTEGER NOT NULL CHECK (difficulty BETWEEN 1 AND 5),
-      glass_type TEXT,
-      is_alcoholic INTEGER NOT NULL DEFAULT 1,
-      creator_user_id INTEGER NOT NULL,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (creator_user_id) REFERENCES users(user_id) ON DELETE CASCADE
-    )
-  `,
-  ).run();
+  try {
+    // Verificar si ya hay datos
+    const cocktailCount = db.prepare('SELECT COUNT(*) as count FROM cocktails').get().count;
+    if (cocktailCount > 0) {
+      // eslint-disable-next-line no-console
+      console.log('📊 Ya existen datos en la base de datos, saltando inserción');
+      return;
+    }
 
-  // Ingredientes
-  db.prepare(
-    `
-    CREATE TABLE IF NOT EXISTS ingredients (
-      ingredient_id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL UNIQUE,
-      unit_type TEXT NOT NULL
-    )
-  `,
-  ).run();
+    // eslint-disable-next-line no-console
+    console.log('🌱 Insertando datos de muestra...');
 
-  // Ingredientes de cócteles
-  db.prepare(
-    `
-    CREATE TABLE IF NOT EXISTS cocktail_ingredients (
-      cocktail_id INTEGER NOT NULL,
-      ingredient_id INTEGER NOT NULL,
-      quantity REAL NOT NULL CHECK (quantity > 0),
-      PRIMARY KEY (cocktail_id, ingredient_id),
-      FOREIGN KEY (cocktail_id) REFERENCES cocktails(cocktail_id) ON DELETE CASCADE,
-      FOREIGN KEY (ingredient_id) REFERENCES ingredients(ingredient_id) ON DELETE RESTRICT
-    )
-  `,
-  ).run();
+    // Insertar usuario de ejemplo
+    const userStmt = db.prepare(`
+      INSERT INTO users (username, email, password)
+      VALUES (?, ?, ?)
+    `);
+    const userId = userStmt.run('Admin', 'admin@zfcocteles.com', 'demo_hash').lastInsertRowid;
 
-  // Pasos
-  db.prepare(
-    `
-    CREATE TABLE IF NOT EXISTS cocktail_steps (
-      step_id INTEGER PRIMARY KEY AUTOINCREMENT,
-      cocktail_id INTEGER NOT NULL,
-      step_number INTEGER NOT NULL,
-      instruction TEXT NOT NULL,
-      UNIQUE (cocktail_id, step_number),
-      FOREIGN KEY (cocktail_id) REFERENCES cocktails(cocktail_id) ON DELETE CASCADE
-    )
-  `,
-  ).run();
+    // Insertar algunos cócteles de ejemplo
+    const cocktailStmt = db.prepare(`
+      INSERT INTO cocktails (name, img_url, difficulty, description, preparation_time, alcohol_content, id_owner)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `);
 
-  // Imágenes
-  db.prepare(
-    `
-    CREATE TABLE IF NOT EXISTS cocktail_images (
-      image_id INTEGER PRIMARY KEY AUTOINCREMENT,
-      cocktail_id INTEGER NOT NULL,
-      url TEXT NOT NULL,
-      uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (cocktail_id) REFERENCES cocktails(cocktail_id) ON DELETE CASCADE
-    )
-  `,
-  ).run();
+    const cocktails = [
+      {
+        name: 'Mojito Clásico',
+        img_url:
+          'https://assets.tmecosys.com/image/upload/t_web_rdp_recipe_584x480/img/recipe/ras/Assets/3A602C62-7F02-4773-ACB2-7603622A3A19/Derivates/5133B835-49A1-4C2C-80EC-74E01842249C.jpg',
+        difficulty: 'fácil',
+        description: 'Refrescante cóctel cubano con menta fresca',
+        preparation_time: 5,
+        alcohol_content: 12.5,
+      },
+      {
+        name: 'Manhattan',
+        img_url: 'https://th.bing.com/th/id/OIP.vYIymbjbJdADafbswXH__gAAAA?rs=1&pid=ImgDetMain',
+        difficulty: 'media',
+        description: 'Clásico cóctel americano con whisky',
+        preparation_time: 3,
+        alcohol_content: 28.0,
+      },
+      {
+        name: 'Piña Colada',
+        img_url:
+          'https://assets.tmecosys.com/image/upload/t_web_rdp_recipe_584x480_1_5x/img/recipe/ras/Assets/A9467000-4182-4A69-802E-6A36234604C1/Derivates/9cca3d9b-727b-4d23-b633-71dcd23125da.jpg',
+        difficulty: 'fácil',
+        description: 'Tropical y cremoso cóctel con piña y coco',
+        preparation_time: 4,
+        alcohol_content: 15.0,
+      },
+    ];
 
-  // Categorías personalizadas
-  db.prepare(
-    `
-    CREATE TABLE IF NOT EXISTS categories (
-      category_id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_id INTEGER NOT NULL,
-      name TEXT NOT NULL,
-      description TEXT,
-      UNIQUE (user_id, name),
-      FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
-    )
-  `,
-  ).run();
+    cocktails.forEach(cocktail => {
+      cocktailStmt.run(
+        cocktail.name,
+        cocktail.img_url,
+        cocktail.difficulty,
+        cocktail.description,
+        cocktail.preparation_time,
+        cocktail.alcohol_content,
+        userId,
+      );
+    });
 
-  // Asociación cóctel ↔ categoría
-  db.prepare(
-    `
-    CREATE TABLE IF NOT EXISTS cocktail_categories (
-      cocktail_id INTEGER NOT NULL,
-      category_id INTEGER NOT NULL,
-      PRIMARY KEY (cocktail_id, category_id),
-      FOREIGN KEY (cocktail_id) REFERENCES cocktails(cocktail_id) ON DELETE CASCADE,
-      FOREIGN KEY (category_id) REFERENCES categories(category_id) ON DELETE CASCADE
-    )
-  `,
-  ).run();
+    // eslint-disable-next-line no-console
+    console.log('✅ Datos de muestra insertados correctamente');
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('❌ Error insertando datos de muestra:', error);
+  }
+}
 
-  // Favoritos
-  db.prepare(
-    `
-    CREATE TABLE IF NOT EXISTS favorites (
-      user_id INTEGER NOT NULL,
-      cocktail_id INTEGER NOT NULL,
-      marked_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      PRIMARY KEY (user_id, cocktail_id),
-      FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-      FOREIGN KEY (cocktail_id) REFERENCES cocktails(cocktail_id) ON DELETE CASCADE
-    )
-  `,
-  ).run();
-
-  // Historial de búsqueda
-  db.prepare(
-    `
-    CREATE TABLE IF NOT EXISTS search_history (
-      search_id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_id INTEGER NOT NULL,
-      query TEXT NOT NULL,
-      searched_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
-    )
-  `,
-  ).run();
-
-  // Historial de preparaciones
-  db.prepare(
-    `
-    CREATE TABLE IF NOT EXISTS preparation_history (
-      prep_id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_id INTEGER NOT NULL,
-      cocktail_id INTEGER,
-      prepared_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-      FOREIGN KEY (cocktail_id) REFERENCES cocktails(cocktail_id) ON DELETE SET NULL
-    )
-  `,
-  ).run();
-
-  // Advertencias
-  db.prepare(
-    `
-    CREATE TABLE IF NOT EXISTS warnings (
-      warning_id INTEGER PRIMARY KEY AUTOINCREMENT,
-      message TEXT NOT NULL,
-      applies_to_alcoholic_only INTEGER NOT NULL DEFAULT 0
-    )
-  `,
-  ).run();
-
-  // Asociación cóctel ↔ advertencia
-  db.prepare(
-    `
-    CREATE TABLE IF NOT EXISTS cocktail_warnings (
-      cocktail_id INTEGER NOT NULL,
-      warning_id INTEGER NOT NULL,
-      PRIMARY KEY (cocktail_id, warning_id),
-      FOREIGN KEY (cocktail_id) REFERENCES cocktails(cocktail_id) ON DELETE CASCADE,
-      FOREIGN KEY (warning_id) REFERENCES warnings(warning_id) ON DELETE CASCADE
-    )
-  `,
-  ).run();
-
-  // Índices útiles
-  db.prepare(`CREATE INDEX IF NOT EXISTS idx_cocktails_name ON cocktails(name)`).run();
-  db.prepare(`CREATE INDEX IF NOT EXISTS idx_cocktails_difficulty ON cocktails(difficulty)`).run();
-  db.prepare(`CREATE INDEX IF NOT EXISTS idx_search_history_user ON search_history(user_id)`).run();
-  db.prepare(
-    `CREATE INDEX IF NOT EXISTS idx_cocktail_images_cocktail_id ON cocktail_images(cocktail_id)`,
-  ).run();
-  db.prepare(
-    `CREATE INDEX IF NOT EXISTS idx_cocktail_steps_cocktail_id ON cocktail_steps(cocktail_id)`,
-  ).run();
+// Mantener la función original por compatibilidad
+export function initializeSchema() {
+  // Ya no necesitamos esto porque usamos schema.sql
+  // eslint-disable-next-line no-console
+  console.log('ℹ️ initializeSchema llamado (usando schema.sql)');
 }

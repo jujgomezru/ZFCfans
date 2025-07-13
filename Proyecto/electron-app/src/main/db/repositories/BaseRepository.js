@@ -1,4 +1,4 @@
-import db from '../config/database.js';
+import { getDatabase } from '../config/database.js';
 
 /**
  * Base Repository class con operaciones comunes
@@ -7,7 +7,7 @@ class BaseRepository {
   constructor(tableName, primaryKey = 'id') {
     this.tableName = tableName;
     this.primaryKey = primaryKey;
-    this.db = db;
+    this.db = getDatabase();
   }
 
   /**

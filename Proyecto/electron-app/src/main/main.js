@@ -1,7 +1,20 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { cocktailRepository } from './db/repositories/index.js';
+
+// Database setup
+import { initializeDatabase } from './db/config/database.js';
+
+// Repositories
+import {
+  cocktailRepository,
+  // categoryRepository,
+  // favoriteRepository,
+  // ingredientRepository,
+  // notificationRepository,
+  // recipeRepository,
+  // userRepository,
+} from './db/repositories/index.js';
 
 // Get __dirname equivalent in ESM
 const __filename = fileURLToPath(import.meta.url);
@@ -25,7 +38,13 @@ function createWindow() {
   }
 }
 
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+  // Inicializar base de datos
+  initializeDatabase();
+
+  // Crear ventana principal
+  createWindow();
+});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
@@ -44,7 +63,7 @@ console.log('ZFCocteles iniciado correctamente 🥂');
 // Canales IPC para gestión de cócteles
 ipcMain.on('guardar-coctel', (event, coctel) => {
   try {
-    const id = cocktailRepository.createCocktail(coctel);
+    const id = cocktailRepository.createComplete(coctel);
     event.reply('guardar-coctel-respuesta', { success: true, id });
   } catch (error) {
     event.reply('guardar-coctel-respuesta', { success: false, error: error.message });
