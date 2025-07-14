@@ -6,6 +6,24 @@ class NotificationRepository extends BaseRepository {
   }
 
   /**
+   * Obtener notificaciones de un usuario (alias para compatibilidad con tests)
+   */
+  findByUser(userId) {
+    const query = `
+      SELECT
+        n.*,
+        c.name AS cocktail_name,
+        c.difficulty AS cocktail_difficulty
+      FROM notifications n
+      LEFT JOIN cocktails c ON n.related_cocktail_id = c.id
+      WHERE n.id_user = ?
+      ORDER BY n.created_at DESC
+    `;
+
+    return this.db.prepare(query).all(userId);
+  }
+
+  /**
    * Obtener notificaciones de un usuario
    */
   findByUserId(userId, options = {}) {
@@ -53,7 +71,7 @@ class NotificationRepository extends BaseRepository {
       notificationData.type,
       notificationData.title,
       notificationData.message,
-      notificationData.is_system || 0,
+      notificationData.is_system !== undefined ? notificationData.is_system : null,
       notificationData.related_cocktail_id || null,
     );
 
@@ -64,11 +82,9 @@ class NotificationRepository extends BaseRepository {
    * Marcar notificación como leída
    */
   markAsRead(notificationId) {
-    const stmt = this.db.prepare(`
-      UPDATE notifications
-      SET is_read = 1, read_at = datetime('now')
-      WHERE id = ?
-    `);
+    const stmt = this.db.prepare(`UPDATE notifications 
+         SET is_read = 1, read_at = datetime('now') 
+         WHERE id = ?`);
 
     const result = stmt.run(notificationId);
     return result.changes > 0;
@@ -78,27 +94,37 @@ class NotificationRepository extends BaseRepository {
    * Marcar todas las notificaciones de un usuario como leídas
    */
   markAllAsRead(userId) {
-    const stmt = this.db.prepare(`
-      UPDATE notifications
-      SET is_read = 1, read_at = datetime('now')
-      WHERE id_user = ? AND is_read = 0
-    `);
+    const stmt = this.db.prepare(`UPDATE notifications 
+         SET is_read = 1, read_at = datetime('now') 
+         WHERE id_user = ? AND is_read = 0`);
 
     const result = stmt.run(userId);
     return result.changes;
   }
 
   /**
+   * Marcar todas las notificaciones de un usuario como leídas (alias para tests)
+   */
+  markAllAsReadForUser(userId) {
+    return this.markAllAsRead(userId);
+  }
+
+  /**
    * Contar notificaciones no leídas
    */
   countUnread(userId) {
-    const stmt = this.db.prepare(`
-      SELECT COUNT(*) as count
-      FROM notifications
-      WHERE id_user = ? AND is_read = 0
-    `);
+    const stmt = this.db.prepare(
+      'SELECT COUNT(*) as count FROM notifications WHERE id_user = ? AND is_read = 0',
+    );
 
     return stmt.get(userId).count;
+  }
+
+  /**
+   * Obtener count de notificaciones no leídas (alias para tests)
+   */
+  getUnreadCount(userId) {
+    return this.countUnread(userId);
   }
 
   /**
@@ -124,6 +150,17 @@ class NotificationRepository extends BaseRepository {
     `);
 
     const result = stmt.run();
+    return result.changes;
+  }
+
+  /**
+   * Eliminar notificaciones antiguas (alias para tests)
+   */
+  deleteOldNotifications(days = 30) {
+    const stmt = this.db.prepare(`DELETE FROM notifications 
+         WHERE created_at < datetime('now', '-' || ? || ' days')`);
+
+    const result = stmt.run(days);
     return result.changes;
   }
 }

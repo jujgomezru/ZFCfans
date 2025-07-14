@@ -14,6 +14,9 @@ class BaseRepository {
    * Encontrar por ID
    */
   findById(id) {
+    if (id === undefined || id === null) {
+      throw new Error('ID is required');
+    }
     const stmt = this.db.prepare(`SELECT * FROM ${this.tableName} WHERE ${this.primaryKey} = ?`);
     return stmt.get(id);
   }
@@ -54,7 +57,7 @@ class BaseRepository {
     `);
 
     const result = stmt.run(...Object.values(data), id);
-    return result.changes > 0;
+    return result.changes;
   }
 
   /**
@@ -63,7 +66,7 @@ class BaseRepository {
   delete(id) {
     const stmt = this.db.prepare(`DELETE FROM ${this.tableName} WHERE ${this.primaryKey} = ?`);
     const result = stmt.run(id);
-    return result.changes > 0;
+    return result.changes;
   }
 
   /**

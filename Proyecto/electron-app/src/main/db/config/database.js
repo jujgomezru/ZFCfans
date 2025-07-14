@@ -3,7 +3,7 @@ import { app } from 'electron';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-import { insertSampleData } from './schema.js';
+import { runAllSeeders } from '../seeders/index.js';
 
 let db = null;
 
@@ -80,12 +80,14 @@ export function initializeDatabase() {
     // Ejecutar esquema desde archivo
     executeSchemaFromFile(db);
 
-    // Insertar datos de ejemplo si es la primera vez
-    insertSampleData();
+    // Ejecutar seeders para datos de ejemplo
+    runAllSeeders(db);
 
+    // eslint-disable-next-line no-console
     console.log('✅ Base de datos inicializada correctamente');
     return db;
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('❌ Error inicializando base de datos:', error);
     throw error;
   }
@@ -104,6 +106,7 @@ export function closeDatabase() {
   if (db) {
     db.close();
     db = null;
+    // eslint-disable-next-line no-console
     console.log('📴 Base de datos cerrada');
   }
 }

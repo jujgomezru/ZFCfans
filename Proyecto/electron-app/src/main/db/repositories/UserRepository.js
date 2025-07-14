@@ -2,7 +2,7 @@ import BaseRepository from './BaseRepository.js';
 
 class UserRepository extends BaseRepository {
   constructor() {
-    super('users', 'user_id');
+    super('users', 'id');
   }
 
   /**
@@ -18,11 +18,11 @@ class UserRepository extends BaseRepository {
    */
   createUser(userData) {
     const stmt = this.db.prepare(`
-      INSERT INTO users (name, email, password_hash)
+      INSERT INTO users (username, email, password)
       VALUES (?, ?, ?)
     `);
 
-    const result = stmt.run(userData.name, userData.email, userData.password_hash);
+    const result = stmt.run(userData.username, userData.email, userData.password);
 
     return result.lastInsertRowid;
   }

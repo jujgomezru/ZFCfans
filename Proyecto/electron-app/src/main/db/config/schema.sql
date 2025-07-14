@@ -39,13 +39,12 @@ CREATE TABLE IF NOT EXISTS cocktails (
     difficulty TEXT NOT NULL CHECK (difficulty IN ('fácil', 'media', 'difícil')),
     description TEXT,
     additional_notes TEXT,
-    preparation_time INTEGER, -- en minutos
-    servings INTEGER DEFAULT 1,
-    alcohol_content REAL, -- porcentaje de alcohol
+    preparation_time INTEGER CHECK (preparation_time > 0), -- en minutos
+    servings INTEGER DEFAULT 1 CHECK (servings > 0),
+    alcohol_content REAL CHECK (alcohol_content >= 0 AND alcohol_content <= 100), -- porcentaje de alcohol
     is_featured INTEGER DEFAULT 0 CHECK (is_featured IN (0, 1)),
     id_owner INTEGER REFERENCES users(id) ON DELETE SET NULL,
     id_pairing INTEGER REFERENCES pairings(id) ON DELETE SET NULL,
-    id_category INTEGER REFERENCES categories(id) ON DELETE SET NULL,
     created_at TEXT DEFAULT (datetime('now')),
     updated_at TEXT DEFAULT (datetime('now'))
 );
@@ -65,9 +64,9 @@ CREATE TABLE IF NOT EXISTS recipes (
 CREATE TABLE IF NOT EXISTS recipe_steps (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     id_recipe INTEGER NOT NULL REFERENCES recipes(id) ON DELETE CASCADE,
-    step_number INTEGER NOT NULL,
+    step_number INTEGER NOT NULL CHECK (step_number > 0),
     instruction TEXT NOT NULL,
-    duration INTEGER, -- tiempo estimado del paso en segundos
+    duration INTEGER CHECK (duration > 0), -- tiempo estimado del paso en segundos
     is_critical INTEGER DEFAULT 0 CHECK (is_critical IN (0, 1)), -- paso crítico
     created_at TEXT DEFAULT (datetime('now')),
     UNIQUE (id_recipe, step_number)
@@ -80,7 +79,7 @@ CREATE TABLE IF NOT EXISTS ingredients (
     type TEXT NOT NULL CHECK (type IN ('esencial', 'opcional')),
     category TEXT, -- 'alcohol', 'mixer', 'garnish', 'ice', etc.
     description TEXT,
-    alcohol_content REAL DEFAULT 0, -- para bebidas alcohólicas
+    alcohol_content REAL DEFAULT 0 CHECK (alcohol_content >= 0 AND alcohol_content <= 100), -- para bebidas alcohólicas
     created_at TEXT DEFAULT (datetime('now'))
 );
 
@@ -112,7 +111,7 @@ CREATE TABLE IF NOT EXISTS preparation_history (
     preparation_date TEXT NOT NULL DEFAULT (datetime('now')),
     score INTEGER DEFAULT 0 CHECK (score BETWEEN 0 AND 5),
     comment TEXT,
-    preparation_time INTEGER, -- tiempo real de preparación en minutos
+    preparation_time INTEGER CHECK (preparation_time > 0), -- tiempo real de preparación en minutos
     difficulty_experienced TEXT CHECK (difficulty_experienced IN ('fácil', 'media', 'difícil')),
     would_make_again INTEGER DEFAULT 1 CHECK (would_make_again IN (0, 1)),
     created_at TEXT DEFAULT (datetime('now'))
@@ -139,7 +138,7 @@ CREATE TABLE IF NOT EXISTS user_settings (
     theme TEXT DEFAULT 'light' CHECK (theme IN ('light', 'dark', 'auto')),
     notifications_enabled INTEGER DEFAULT 1 CHECK (notifications_enabled IN (0, 1)),
     inventory_reminders INTEGER DEFAULT 1 CHECK (inventory_reminders IN (0, 1)),
-    default_serving_size INTEGER DEFAULT 1,
+    default_serving_size INTEGER DEFAULT 1 CHECK (default_serving_size > 0),
     preferred_units TEXT DEFAULT 'ml' CHECK (preferred_units IN ('ml', 'oz')),
     created_at TEXT DEFAULT (datetime('now')),
     updated_at TEXT DEFAULT (datetime('now'))
@@ -147,12 +146,14 @@ CREATE TABLE IF NOT EXISTS user_settings (
 
 -- Índices para optimizar consultas (con protección contra duplicación)
 CREATE INDEX IF NOT EXISTS idx_cocktails_difficulty ON cocktails(difficulty);
-CREATE INDEX IF NOT EXISTS idx_cocktails_category ON cocktails(id_category);
+CREATE INDEX IF NOT EXISTS idx_cocktails_name ON cocktails(name);
 CREATE INDEX IF NOT EXISTS idx_cocktails_owner ON cocktails(id_owner);
 CREATE INDEX IF NOT EXISTS idx_preparation_history_user ON preparation_history(id_user);
 CREATE INDEX IF NOT EXISTS idx_preparation_history_date ON preparation_history(preparation_date);
 CREATE INDEX IF NOT EXISTS idx_notifications_user_unread ON notifications(id_user, is_read);
 CREATE INDEX IF NOT EXISTS idx_recipe_steps_recipe ON recipe_steps(id_recipe, step_number);
+CREATE INDEX IF NOT EXISTS idx_cocktail_categories_cocktail ON cocktail_categories(id_cocktail);
+CREATE INDEX IF NOT EXISTS idx_cocktail_categories_category ON cocktail_categories(id_category);
 
 -- Insertar categorías del sistema por defecto (con protección contra duplicación)
 INSERT OR IGNORE INTO categories (name, description, color, is_system) VALUES
