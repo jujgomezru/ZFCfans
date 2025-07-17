@@ -1,5 +1,8 @@
+import { useNavigation } from '../../context/NavigationContext';
+
 function CoctelCard({ coctel }) {
-  const { nombre, imagen, categoria } = coctel;
+  const { navigateTo } = useNavigation();
+  const { nombre, imagen, categoria, id } = coctel;
 
   const getCategoryStyle = categoria => {
     switch (categoria?.toLowerCase()) {
@@ -37,7 +40,10 @@ function CoctelCard({ coctel }) {
       </span>
 
       {/* Action button */}
-      <button className="btn-secondary focus-ring w-full py-3 px-4 rounded-lg font-semibold">
+      <button
+        onClick={() => navigateTo('resumen-informativo', { recipeId: id })} // ← navegación
+        className="btn-secondary focus-ring w-full py-3 px-4 rounded-lg font-semibold"
+      >
         Ver detalles
       </button>
     </div>

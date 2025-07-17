@@ -19,6 +19,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // TODO: Uncomment when needed
   // GESTIÓN DE RECETAS
+  obtenerRecetaCompleta: recipeId =>
+    ipcRenderer.invoke('obtener-receta-completa', recipeId),
+
   // GESTIÓN DE CATEGORÍAS
   // GESTIÓN DE INGREDIENTES
   // GESTIÓN DE USUARIOS

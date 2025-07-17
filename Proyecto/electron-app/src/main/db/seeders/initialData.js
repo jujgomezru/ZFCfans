@@ -45,14 +45,23 @@ export function insertInitialCocktails(db, force = false) {
       difficulty: 'fácil',
       description: 'Refrescante aperitivo italiano con Aperol y Prosecco',
       category_name: 'aperitivo',
-    },
-    {
-      name: 'Piña Colada',
-      img_url:
-        'https://assets.tmecosys.com/image/upload/t_web_rdp_recipe_584x480_1_5x/img/recipe/ras/Assets/A9467000-4182-4A69-802E-6A36234604C1/Derivates/9cca3d9b-727b-4d23-b633-71dcd23125da.jpg',
-      difficulty: 'fácil',
-      description: 'Tropical y cremoso cóctel caribeño con ron y coco',
-      category_name: 'dulce',
+      recipe: {
+        glass_type: 'stemmed_balloon_glass',
+        garnish: 'Rodaja de naranja',
+        serving_suggestion: 'Servir con hielo en copa de balón',
+        ingredients: [
+          { name: 'Prosecco D.O.C.', qty: 90, unit: 'ml' },
+          { name: 'Aperol', qty: 60, unit: 'ml' },
+          { name: 'Agua con gas', qty: 30, unit: 'ml' },
+        ],
+        steps: [
+          'Coloca cubitos de hielo en una copa de balón',
+          'Añade 3 partes de Prosecco D.O.C. (9 cl)',
+          'Añade 2 partes de Aperol (6 cl)',
+          'Añade 1 parte de agua con gas (3 cl)',
+          'Decora con una rodaja de naranja',
+        ],
+      },
     },
     {
       name: 'Manhattan',
@@ -84,6 +93,25 @@ export function insertInitialCocktails(db, force = false) {
     },
   ];
 
+  // 5. Asegurar ingredientes base
+  const insertIngredient = db.prepare(`
+    INSERT OR IGNORE INTO ingredients (name, type, category, description, alcohol_content)
+    VALUES (?, 'esencial', ?, ?, ?)
+  `);
+  cocktails.forEach(c => {
+    if (c.recipe) {
+      c.recipe.ingredients.forEach(ing => {
+        insertIngredient.run(
+          ing.name,
+          'alcohol', // o 'mixer' si ing.alcohol_content === 0
+          `Descripción de ${ing.name}`,
+          // si quieres un contenido real, definelo aquí:
+          ing.name === 'Agua con gas' ? 0.0 : 11.0,
+        );
+      });
+    }
+  });
+
   // 2. Obtener el ID del usuario demo (ya sea recién creado o existente)
   const demoUser = db.prepare(`SELECT id FROM users WHERE username = ? LIMIT 1`).get('demo_user');
   const demoUserId = demoUser ? demoUser.id : 1;
@@ -98,7 +126,7 @@ export function insertInitialCocktails(db, force = false) {
     SELECT id FROM categories WHERE name = ?
   `);
 
-  const insertCocktail = db.prepare(`
+  const insertCocktailStmt = db.prepare(`
     INSERT INTO cocktails (name, img_url, difficulty, description, id_owner)
     VALUES (?, ?, ?, ?, ?)
   `);
@@ -108,9 +136,24 @@ export function insertInitialCocktails(db, force = false) {
     VALUES (?, ?)
   `);
 
-  // 4. Crear categorías únicas primero
-  const categorySet = new Set();
-  cocktails.forEach(c => categorySet.add(c.category_name));
+  const insertRecipeStmt = db.prepare(
+    `INSERT INTO recipes (id_cocktail, glass_type, garnish, serving_suggestion) VALUES (?, ?, ?, ?)`,
+  );
+  const getIngredientId = db.prepare(`SELECT id FROM ingredients WHERE name = ? LIMIT 1`);
+  const insertRecipeIngredient = db.prepare(`
+    INSERT INTO recipe_ingredients (id_recipe, id_ingredient, quantity, unit, preparation_note, is_optional, order_index)
+    VALUES (?, ?, ?, ?, ?, 0, ?)
+  `);
+  const insertRecipeStep = db.prepare(`
+    INSERT INTO recipe_steps (id_recipe, step_number, instruction, duration, is_critical)
+    VALUES (?, ?, ?, ?, ?)
+  `);
+
+  // 8. Crear categorías únicas
+  const categorySet = new Set(cocktails.map(c => c.category_name));
+  categorySet.forEach(cat => {
+    insertCategory.run(cat, `Categoría de ${cat}`, demoUserId);
+  });
 
   for (const categoryName of categorySet) {
     insertCategory.run(categoryName, `Categoría de ${categoryName}`, demoUserId);
@@ -118,33 +161,32 @@ export function insertInitialCocktails(db, force = false) {
     console.log(`📁 Categoría creada: ${categoryName}`);
   }
 
-  // 5. Insertar cócteles
-  for (const c of cocktails) {
-    // Insertar cóctel con el usuario correcto
-    const info = insertCocktail.run(c.name, c.img_url, c.difficulty, c.description, demoUserId);
+  // 9. Insertar cócteles y recetas dinámicamente
+  cocktails.forEach(c => {
+    const info = insertCocktailStmt.run(c.name, c.img_url, c.difficulty, c.description, demoUserId);
 
-    // Obtener ID de categoría y vincular
-    const categoryResult = getCategoryId.get(c.category_name);
-    if (categoryResult) {
-      insertCocktailCategory.run(info.lastInsertRowid, categoryResult.id);
-      // eslint-disable-next-line no-console
-      console.log(`🍹 Cóctel "${c.name}" vinculado a categoría "${c.category_name}"`);
-    } else {
-      // eslint-disable-next-line no-console
-      console.warn(`⚠️ No se encontró categoría "${c.category_name}" para cóctel "${c.name}"`);
+    const catId = getCategoryId.get(c.category_name).id;
+    insertCocktailCategory.run(info.lastInsertRowid, catId);
+
+    if (c.recipe) {
+      const recInfo = insertRecipeStmt.run(
+        info.lastInsertRowid,
+        c.recipe.glass_type,
+        c.recipe.garnish,
+        c.recipe.serving_suggestion,
+      );
+      const recipeId = recInfo.lastInsertRowid;
+
+      // ingredients
+      c.recipe.ingredients.forEach((ing, idx) => {
+        const ingId = getIngredientId.get(ing.name).id;
+        insertRecipeIngredient.run(recipeId, ingId, ing.qty, ing.unit, '', idx + 1);
+      });
+
+      // steps
+      c.recipe.steps.forEach((instr, idx) => {
+        insertRecipeStep.run(recipeId, idx + 1, instr, 5, idx === 0 ? 1 : 0);
+      });
     }
-  }
-
-  // eslint-disable-next-line no-console
-  console.log(`✅ Seeder completado: ${cocktails.length} cócteles insertados`);
-
-  // Verificar resultado final
-  const finalCocktailCount = db.prepare('SELECT COUNT(*) as count FROM cocktails').get().count;
-  const finalCategoryCount = db.prepare('SELECT COUNT(*) as count FROM categories').get().count;
-  const linkedCount = db.prepare('SELECT COUNT(*) as count FROM cocktail_categories').get().count;
-
-  // eslint-disable-next-line no-console
-  console.log(
-    `📊 Resultado: ${finalCocktailCount} cócteles, ${finalCategoryCount} categorías, ${linkedCount} vínculos`,
-  );
+  });
 }

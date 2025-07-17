@@ -8,6 +8,7 @@ import {
   ManualPage,
   NotificacionesPage,
   PreparacionPage,
+  ResumenInformativoPage,
   UsuarioPage,
 } from '../../pages';
 import { useNavigation } from '../../context/NavigationContext';
@@ -34,6 +35,8 @@ function MainContent() {
         return <ConsumoResponsablePage />;
       case 'preparacion':
         return <PreparacionPage />;
+      case 'resumen-informativo':
+        return <ResumenInformativoPage />;
       case 'usuario':
         return <UsuarioPage />;
       case 'notificaciones':

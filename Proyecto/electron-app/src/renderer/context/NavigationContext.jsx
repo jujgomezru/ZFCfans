@@ -18,41 +18,43 @@ const pageNames = {
   preparacion: 'Preparar cóctel',
   'consumo-responsable': 'Consumo responsable',
   notificaciones: 'Notificaciones',
+  'resumen-informativo': 'Resumen Informativo',
 };
 
 export function NavigationProvider({ children }) {
   const [currentPage, setCurrentPage] = useState('catalogo');
+  const [params, setParams] = useState({});
 
-  const navigateTo = pageId => {
+  const navigateTo = (pageId, navigationParams = {}) => {
     setCurrentPage(pageId);
+    setParams(navigationParams);
   };
 
   const navigateNext = () => {
-    // Si estamos en una página externa, ir a catálogo primero
     if (!pageOrder.includes(currentPage)) {
       setCurrentPage('catalogo');
+      setParams({});
       return;
     }
-
     const currentIndex = pageOrder.indexOf(currentPage);
     const nextIndex = (currentIndex + 1) % pageOrder.length;
     setCurrentPage(pageOrder[nextIndex]);
+    setParams({});
   };
 
   const navigatePrevious = () => {
-    // Si estamos en una página externa, ir a catálogo primero
     if (!pageOrder.includes(currentPage)) {
       setCurrentPage('catalogo');
+      setParams({});
       return;
     }
-
     const currentIndex = pageOrder.indexOf(currentPage);
     const previousIndex = currentIndex === 0 ? pageOrder.length - 1 : currentIndex - 1;
     setCurrentPage(pageOrder[previousIndex]);
+    setParams({});
   };
 
   const getCurrentPageInfo = () => {
-    // Si estamos en una página externa al sidebar
     if (!pageOrder.includes(currentPage)) {
       return {
         current: currentPage,
@@ -65,12 +67,9 @@ export function NavigationProvider({ children }) {
         previousName: pageNames.catalogo,
       };
     }
-
-    // Si estamos en una página del sidebar, comportamiento normal
     const currentIndex = pageOrder.indexOf(currentPage);
     const nextIndex = (currentIndex + 1) % pageOrder.length;
     const previousIndex = currentIndex === 0 ? pageOrder.length - 1 : currentIndex - 1;
-
     return {
       current: currentPage,
       currentName: pageNames[currentPage],
@@ -87,6 +86,7 @@ export function NavigationProvider({ children }) {
     <NavigationContext.Provider
       value={{
         currentPage,
+        params,
         navigateTo,
         navigateNext,
         navigatePrevious,

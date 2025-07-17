@@ -13,7 +13,7 @@ import {
   // favoriteRepository,
   // ingredientRepository,
   // notificationRepository,
-  // recipeRepository,
+  recipeRepository,
   // userRepository,
 } from './db/repositories/index.js';
 
@@ -103,5 +103,25 @@ ipcMain.handle('obtener-estadisticas', async () => {
     return { success: true, data: stats };
   } catch (error) {
     return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('obtener-receta-completa', async (_event, cocktailId) => {
+  try {
+    console.log('📋 obtener-receta-completa llamado con cocktailId=', cocktailId);
+
+    // 1. Busca la fila de recipes asociada al cóctel
+    const rec = recipeRepository.findByCocktailId(cocktailId);
+    if (!rec || !rec.id) {
+      console.warn(`⚠️ No existe receta para cocktailId=${cocktailId}`);
+      return null; // el front verá recipe === null y podrá mostrar “no encontrada”
+    }
+
+    // 2. Con ese recipe.id, trae ya todos los detalles
+    const complete = await recipeRepository.getComplete(rec.id);
+    return complete;
+  } catch (err) {
+    console.error('Error en handler obtener-receta-completa:', err);
+    throw err;
   }
 });
