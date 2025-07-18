@@ -41,7 +41,7 @@ function CoctelCard({ coctel }) {
 
       {/* Action button */}
       <button
-        onClick={() => navigateTo('resumen-informativo', { recipeId: id })} // ← navegación
+        onClick={() => navigateTo('resumen-informativo', { recipeId: id, nombre, imagen })} // ← navegación
         className="btn-secondary focus-ring w-full py-3 px-4 rounded-lg font-semibold"
       >
         Ver detalles

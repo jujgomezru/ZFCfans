@@ -436,6 +436,25 @@ class CocktailRepository extends BaseRepository {
     const result = stmt.run(cocktailId, categoryId);
     return result.changes;
   }
+
+  getDifficulty(cocktailId) {
+    const row = this.db.prepare(`SELECT difficulty FROM cocktails WHERE id = ?`).get(cocktailId);
+    return row?.difficulty ?? null;
+  }
+
+  getTotalDuration(cocktailId) {
+    const row = this.db
+      .prepare(
+        `
+        SELECT SUM(rs.duration) AS total_duration
+        FROM recipe_steps rs
+        JOIN recipes r ON rs.id_recipe = r.id
+        WHERE r.id_cocktail = ?
+      `,
+      )
+      .get(cocktailId);
+    return row?.total_duration ?? 0;
+  }
 }
 
 export default CocktailRepository;

@@ -110,16 +110,29 @@ ipcMain.handle('obtener-receta-completa', async (_event, cocktailId) => {
   try {
     console.log('📋 obtener-receta-completa llamado con cocktailId=', cocktailId);
 
-    // 1. Busca la fila de recipes asociada al cóctel
+    // 1) Busca la fila de recipes asociada al cóctel
     const rec = recipeRepository.findByCocktailId(cocktailId);
     if (!rec || !rec.id) {
       console.warn(`⚠️ No existe receta para cocktailId=${cocktailId}`);
-      return null; // el front verá recipe === null y podrá mostrar “no encontrada”
+      return null;
     }
 
-    // 2. Con ese recipe.id, trae ya todos los detalles
+    // 2) Con ese recipe.id, trae los detalles básicos (ingredientes, pasos, etc.)
     const complete = await recipeRepository.getComplete(rec.id);
-    return complete;
+    if (!complete) {
+      return null;
+    }
+
+    // 3) Enriquecer con difficulty (de cocktails) y duration total (suma de recipe_steps)
+    const difficulty = cocktailRepository.getDifficulty(cocktailId);
+    const totalDuration = cocktailRepository.getTotalDuration(cocktailId);
+
+    // 4) Devolver un único objeto con todo
+    return {
+      ...complete,
+      difficulty,
+      preparation_time: totalDuration,
+    };
   } catch (err) {
     console.error('Error en handler obtener-receta-completa:', err);
     throw err;

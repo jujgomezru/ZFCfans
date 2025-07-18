@@ -5,7 +5,7 @@ import Instructivo from '../components/resumen/Instructivo';
 
 function ResumenInformativoPage() {
   const { params, navigateTo } = useNavigation();
-  const { recipeId } = params;
+  const { recipeId, nombre: coctelNombre, imagen: coctelImagen } = params;
   const [recipe, setRecipe] = useState(null);
   const [error, setError] = useState(null);
 
@@ -68,15 +68,14 @@ function ResumenInformativoPage() {
           ×
         </button>
       </div>
-
+      {/* Pasa nombre e imagen desde params */}
       <Descripcion
-        name={recipe.cocktail_name}
+        name={coctelNombre}
+        image={coctelImagen}
         difficulty={recipe.difficulty}
         preparationTime={recipe.preparation_time}
         glassType={recipe.glass_type}
-        imgUrl={recipe.img_url}
       />
-
       <Instructivo steps={recipe.steps} />
     </>
   );
