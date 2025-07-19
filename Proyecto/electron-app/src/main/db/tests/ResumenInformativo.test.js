@@ -21,45 +21,80 @@ describe('CocktailRepository – métodos para ResumenInformativo', () => {
     repository.db = mockDb;
   });
 
-  describe('getDifficulty', () => {
-    it('debería devolver la dificultad del cóctel por su ID', () => {
-      // Preparamos el statement mock
-      const mockStatement = {
-        get: vi.fn(() => ({ difficulty: 'Medio' })),
-      };
-      mockDb.prepare.mockReturnValue(mockStatement);
+  const RUNS = 32;
+  for (let run = 1; run <= RUNS; run++) {
+    describe(`Iteración #${run}`, () => {
+      describe('getDifficulty', () => {
+        it('debería devolver la dificultad del cóctel por su ID', () => {
+          const mockStatement = { get: vi.fn(() => ({ difficulty: 'Medio' })) };
+          mockDb.prepare.mockReturnValue(mockStatement);
 
-      // Llamamos al método
-      const result = repository.getDifficulty(42);
+          const result = repository.getDifficulty(42);
 
-      // Verificamos que se usó la consulta SQL correcta con el ID
-      expect(mockDb.prepare).toHaveBeenCalledWith(
-        'SELECT difficulty FROM cocktails WHERE id = ?',
-        42,
-      );
-      // Y que devolvió el valor correcto
-      expect(result).toBe('Medio');
+          expect(mockDb.prepare).toHaveBeenCalledWith(
+            'SELECT difficulty FROM cocktails WHERE id = ?',
+          );
+          expect(mockStatement.get).toHaveBeenCalledWith(42);
+          expect(result).toBe('Medio');
+        });
+      });
+
+      describe('getTotalDuration', () => {
+        it('debería devolver el total de duración usando SUM en SQL', () => {
+          const mockStatement = { get: vi.fn(() => ({ total_duration: 10 })) };
+          mockDb.prepare.mockReturnValue(mockStatement);
+
+          const total = repository.getTotalDuration(99);
+
+          expect(mockDb.prepare).toHaveBeenCalledWith(
+            expect.stringContaining('SELECT SUM(rs.duration) AS total_duration'),
+          );
+          expect(mockStatement.get).toHaveBeenCalledWith(99);
+          expect(total).toBe(10);
+        });
+      });
     });
-  });
+  }
 
-  describe('getDuration', () => {
-    it('debería sumar todas las duraciones de pasos y devolver el total', () => {
-      // Simulamos tres pasos con duraciones
-      const mockStatement = {
-        all: vi.fn(() => [{ duration: 5 }, { duration: 3 }, { duration: 2 }]),
-      };
-      mockDb.prepare.mockReturnValue(mockStatement);
+  //   describe('getDifficulty', () => {
+  //     it('debería devolver la dificultad del cóctel por su ID', () => {
+  //       // Preparamos el statement mock
+  //       const mockStatement = {
+  //         get: vi.fn(() => ({ difficulty: 'Medio' })),
+  //       };
+  //       mockDb.prepare.mockReturnValue(mockStatement);
 
-      // Llamamos al método
-      const total = repository.getDuration(99);
+  //       // Llamamos al método
+  //       const result = repository.getDifficulty(42);
 
-      // Verificamos la consulta y el argumento
-      expect(mockDb.prepare).toHaveBeenCalledWith(
-        'SELECT duration FROM recipe_steps WHERE cocktail_id = ?',
-        99,
-      );
-      // Y que sumó correctamente: 5 + 3 + 2 = 10
-      expect(total).toBe(10);
-    });
-  });
+  //       // Verificamos que se usó la consulta SQL correcta con el ID
+  //       expect(mockDb.prepare).toHaveBeenCalledWith('SELECT difficulty FROM cocktails WHERE id = ?');
+  //       expect(mockStatement.get).toHaveBeenCalledWith(42);
+  //       // Y que devolvió el valor correcto
+  //       expect(result).toBe('Medio');
+  //     });
+  //   });
+
+  //   describe('getTotalDuration', () => {
+  //     it('debería devolver el total de duración usando SUM en SQL', () => {
+  //       // Stub: el statement devuelve un objeto con total_duration
+  //       const mockStatement = {
+  //         get: vi.fn(() => ({ total_duration: 5 + 3 + 2 })),
+  //       };
+  //       mockDb.prepare.mockReturnValue(mockStatement);
+
+  //       // Llamamos al método correcto
+  //       const total = repository.getTotalDuration(99);
+
+  //       // 1) El SQL debe usar SUM(...) AS total_duration
+  //       expect(mockDb.prepare).toHaveBeenCalledWith(
+  //         expect.stringContaining('SELECT SUM(rs.duration) AS total_duration'),
+  //       );
+  //       // 2) El parámetro pasa por get()
+  //       expect(mockStatement.get).toHaveBeenCalledWith(99);
+  //       // 3) El método devuelve el valor total
+  //       expect(total).toBe(10);
+  //     });
+  //   });
+  // });
 });
