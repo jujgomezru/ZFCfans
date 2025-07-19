@@ -60,6 +60,7 @@ npm run test -- --watch  # Tests en modo watch
 npm run lint         # Revisar código con ESLint
 npm run lint:fix     # Corregir automáticamente
 npm run format       # Formatear con Prettier
+npm run format:check # Verificar formato
 npm run code-quality # Formato + lint + tests
 ```
 
@@ -67,8 +68,9 @@ npm run code-quality # Formato + lint + tests
 
 ```bash
 npm run build        # Build completo + instalador
-npm run pack         # Empaquetado sin instalador (rápido)
 npm run build:renderer  # Solo frontend React
+npm run pack         # Empaquetado sin instalador (rápido)
+npm run dist         # Crear instalador para Windows/macOS/Linux
 ```
 
 ### Utilidades
@@ -78,57 +80,13 @@ npm run rebuild-sqlite  # Recompilar SQLite manualmente
 npm run postinstall     # Configurar dependencias de Electron
 ```
 
-## 🗂️ Estructura de Archivos
-
-```
-electron-app/
-├── src/
-│   ├── main/               # Proceso principal de Electron
-│   │   ├── main.js         # Entrada principal
-│   │   ├── db/             # Base de datos
-│   │   │   ├── database.js     # Configuración SQLite
-│   │   │   ├── coctelRepository.js  # Repository pattern
-│   │   │   └── index.js        # Exports unificados
-│   │   └── tests/          # Tests del proceso principal
-│   │
-│   ├── preload/            # Scripts de seguridad IPC
-│   │   └── preload.js      # Bridge main ↔ renderer
-│   │
-│   └── renderer/           # Aplicación React
-│       ├── components/     # Componentes de UI
-│       ├── models/         # Entidades de dominio
-│       ├── builders/       # Patrón Builder
-│       ├── controllers/    # Lógica de control (MVC)
-│       ├── services/       # Lógica de negocio
-│       ├── hooks/          # Custom hooks React
-│       ├── context/        # Context API
-│       ├── utils/          # Funciones auxiliares
-│       ├── tests/          # Tests de React
-│       │   ├── components/ # Tests de componentes
-│       │   ├── services/   # Tests de servicios
-│       │   └── utils/      # Tests de utilidades
-│       ├── index.html      # Plantilla HTML
-│       └── main.jsx        # Entrada React
-│
-├── public/                 # Assets estáticos
-├── docs/                   # Documentación
-├── .vscode/                # Configuración VS Code
-├── package.json            # Configuración del proyecto
-├── vite.config.js          # Configuración Vite
-├── vitest.config.mjs       # Configuración testing
-└── eslint.config.js        # Configuración linting
-```
-
 ## 🎯 Workflow de Desarrollo
 
 ### 1. Desarrollo diario
 
 ```bash
-# Terminal 1: Iniciar desarrollo
+# Iniciar desarrollo
 npm run dev
-
-# Terminal 2: Tests en watch mode
-npm run test -- --watch
 
 # Antes de commit
 npm run code-quality
@@ -136,14 +94,19 @@ npm run code-quality
 
 ### 2. Convenciones de archivos
 
-| Tipo                  | Ubicación               | Convención                   | Ejemplo               |
-| --------------------- | ----------------------- | ---------------------------- | --------------------- |
-| **Componentes React** | `renderer/components/`  | PascalCase + `.jsx`          | `CoctelCard.jsx`      |
-| **Hooks**             | `renderer/hooks/`       | camelCase + `use` prefix     | `useCocteles.js`      |
-| **Services**          | `renderer/services/`    | camelCase + `Service` suffix | `coctelService.js`    |
-| **Models**            | `renderer/models/`      | PascalCase                   | `Coctel.js`           |
-| **Builders**          | `renderer/builders/`    | PascalCase + `Builder`       | `CoctelBuilder.js`    |
-| **Controllers**       | `renderer/controllers/` | PascalCase + `Controller`    | `CoctelController.js` |
+| Tipo                  | Ubicación               | Convención                    | Ejemplo               |
+| --------------------- | ----------------------- | ----------------------------- | --------------------- |
+| **Builders**          | `renderer/builders/`    | PascalCase + `Builder`        | `CoctelBuilder.js`    |
+| **Componentes React** | `renderer/components/`  | PascalCase + `.jsx`           | `CoctelCard.jsx`      |
+| **Contextos**         | `renderer/context/`     | PascalCase + `Context` suffix | `CoctelContext.js`    |
+| **Controllers**       | `renderer/controllers/` | PascalCase + `Controller`     | `CoctelController.js` |
+| **Hooks**             | `renderer/hooks/`       | `use` prefix + camelCase      | `useCocteles.js`      |
+| **Models**            | `renderer/models/`      | PascalCase                    | `Coctel.js`           |
+| **Pages**             | `renderer/pages/`       | PascalCase                    | `Catalogo.jsx`        |
+| **Services**          | `renderer/services/`    | camelCase + `Service` suffix  | `coctelService.js`    |
+| **Utils**             | `renderer/utils/`       | camelCase                     | `formatters.js`       |
+| **Tests**             | Directorio respectivo   | `.test.js`                    | `CoctelCard.test.jsx` |
+| **Repositories**      | `main/db/repositories/` | PascalCase + `Repository`     | `CoctelRepository.js` |
 
 ### 3. Tests
 
@@ -178,6 +141,7 @@ git checkout -b docs/actualizar-readme
 ### Commits
 
 Seguimos [Conventional Commits](https://conventionalcommits.org/):
+Asegúrate de que tus commits sean claros y concisos. Usa el formato `tipo: descripción breve`.
 
 ```bash
 git commit -m "feat: agregar componente CoctelCard"
@@ -185,6 +149,8 @@ git commit -m "fix: corregir error en búsqueda de cócteles"
 git commit -m "docs: actualizar guía de onboarding"
 git commit -m "test: agregar tests para CoctelBuilder"
 ```
+
+**⚠ Nota:** Asegúrate de que el proyecto compile y pase los tests antes de hacer push.
 
 ## ✅ Checklist de Configuración
 

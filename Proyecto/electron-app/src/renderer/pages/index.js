@@ -7,4 +7,5 @@ export { default as HistorialPage } from './HistorialPage';
 export { default as ManualPage } from './ManualPage';
 export { default as NotificacionesPage } from './NotificacionesPage';
 export { default as PreparacionPage } from './PreparacionPage';
+export { default as ResumenInformativoPage } from './ResumenInformativoPage';
 export { default as UsuarioPage } from './UsuarioPage';

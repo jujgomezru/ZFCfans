@@ -1,7 +1,21 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import db from './db/index.js';
+
+// Database setup
+import { initializeDatabase } from './db/config/database.js';
+
+// Repositories
+import {
+  cocktailRepository,
+  // TODO: Uncomment when needed
+  // categoryRepository,
+  // favoriteRepository,
+  // ingredientRepository,
+  // notificationRepository,
+  recipeRepository,
+  // userRepository,
+} from './db/repositories/index.js';
 
 // Get __dirname equivalent in ESM
 const __filename = fileURLToPath(import.meta.url);
@@ -25,7 +39,13 @@ function createWindow() {
   }
 }
 
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+  // Inicializar base de datos
+  initializeDatabase();
+
+  // Crear ventana principal
+  createWindow();
+});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
@@ -44,7 +64,7 @@ console.log('ZFCocteles iniciado correctamente 🥂');
 // Canales IPC para gestión de cócteles
 ipcMain.on('guardar-coctel', (event, coctel) => {
   try {
-    const id = db.guardarCoctel(coctel);
+    const id = cocktailRepository.createComplete(coctel);
     event.reply('guardar-coctel-respuesta', { success: true, id });
   } catch (error) {
     event.reply('guardar-coctel-respuesta', { success: false, error: error.message });
@@ -53,7 +73,7 @@ ipcMain.on('guardar-coctel', (event, coctel) => {
 
 ipcMain.handle('obtener-cocteles', async () => {
   try {
-    return { success: true, data: db.obtenerTodosCocteles() };
+    return { success: true, data: cocktailRepository.findAllWithBasicInfo() };
   } catch (error) {
     return { success: false, error: error.message };
   }
@@ -61,7 +81,7 @@ ipcMain.handle('obtener-cocteles', async () => {
 
 ipcMain.handle('obtener-coctel', async (event, id) => {
   try {
-    const coctel = db.obtenerCoctelPorId(id);
+    const coctel = cocktailRepository.findCompleteById(id);
     return { success: true, data: coctel };
   } catch (error) {
     return { success: false, error: error.message };
@@ -70,7 +90,7 @@ ipcMain.handle('obtener-coctel', async (event, id) => {
 
 ipcMain.handle('buscar-cocteles', async (event, nombre) => {
   try {
-    const cocteles = db.buscarCoctelesPorNombre(nombre);
+    const cocteles = cocktailRepository.searchByName(nombre);
     return { success: true, data: cocteles };
   } catch (error) {
     return { success: false, error: error.message };
@@ -79,9 +99,42 @@ ipcMain.handle('buscar-cocteles', async (event, nombre) => {
 
 ipcMain.handle('obtener-estadisticas', async () => {
   try {
-    const stats = db.obtenerEstadisticas();
+    const stats = cocktailRepository.getStatistics();
     return { success: true, data: stats };
   } catch (error) {
     return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('obtener-receta-completa', async (_event, cocktailId) => {
+  try {
+    console.log('📋 obtener-receta-completa llamado con cocktailId=', cocktailId);
+
+    // 1) Busca la fila de recipes asociada al cóctel
+    const rec = recipeRepository.findByCocktailId(cocktailId);
+    if (!rec || !rec.id) {
+      console.warn(`⚠️ No existe receta para cocktailId=${cocktailId}`);
+      return null;
+    }
+
+    // 2) Con ese recipe.id, trae los detalles básicos (ingredientes, pasos, etc.)
+    const complete = await recipeRepository.getComplete(rec.id);
+    if (!complete) {
+      return null;
+    }
+
+    // 3) Enriquecer con difficulty (de cocktails) y duration total (suma de recipe_steps)
+    const difficulty = cocktailRepository.getDifficulty(cocktailId);
+    const totalDuration = cocktailRepository.getTotalDuration(cocktailId);
+
+    // 4) Devolver un único objeto con todo
+    return {
+      ...complete,
+      difficulty,
+      preparation_time: totalDuration,
+    };
+  } catch (err) {
+    console.error('Error en handler obtener-receta-completa:', err);
+    throw err;
   }
 });

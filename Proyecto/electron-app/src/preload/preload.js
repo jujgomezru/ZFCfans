@@ -1,6 +1,7 @@
-import { contextBridge, ipcRenderer } from 'electron';
+const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electronAPI', {
+  // GESTIÓN DE CÓCTELES
   // Crear cóctel
   guardarCoctel: coctel => ipcRenderer.send('guardar-coctel', coctel),
   onGuardarCoctelResp: callback =>
@@ -15,4 +16,18 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // Estadísticas
   obtenerEstadisticas: () => ipcRenderer.invoke('obtener-estadisticas'),
+
+  // TODO: Uncomment when needed
+  // GESTIÓN DE RECETAS
+  obtenerRecetaCompleta: recipeId =>
+    ipcRenderer.invoke('obtener-receta-completa', recipeId),
+
+  // GESTIÓN DE CATEGORÍAS
+  // GESTIÓN DE INGREDIENTES
+  // GESTIÓN DE USUARIOS
+  // GESTIÓN DE FAVORITOS
+  // GESTIÓN DE CONFIGURACIÓN
+  // GESTIÓN DE NOTIFICACIONES
+  // GESTIÓN DE ACOMPAÑAMIENTOS
+  // GESTIÓN DE HISTORIAL
 });
