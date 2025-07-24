@@ -1,14 +1,58 @@
 import { BackIcon, BellIcon, CocktailShakerIcon, ForwardIcon } from '../icons/Icons';
-import SearchBar from '../common/SearchBar';
+import AdvancedSearchBar from '../search/AdvancedSearchBar';
 import { useNavigation } from '../../context/NavigationContext';
+import { useSearch } from '../../hooks/useSearch';
+import { useCallback } from 'react';
 
 function Header() {
   const { navigateTo, navigateNext, navigatePrevious, getCurrentPageInfo } = useNavigation();
+  const { searchWithFilters, getSuggestions, suggestions, loading: searchLoading } = useSearch();
   const pageInfo = getCurrentPageInfo();
 
-  const handleSearch = _searchTerm => {
-    // TODO: implementar lógica de búsqueda
-  };
+  // Manejar búsqueda desde el header global
+  const handleSearch = useCallback(
+    async (term, isFinalSearch = false) => {
+      if (!term || term.trim().length === 0) {
+        return;
+      }
+
+      if (isFinalSearch) {
+        // Hacer búsqueda y navegar a catálogo si no estamos allí
+        await searchWithFilters({ search: term.trim() });
+        if (pageInfo.current !== 'catalogo') {
+          navigateTo('catalogo');
+        }
+      } else if (term.length >= 2) {
+        // Obtener sugerencias para autocompletar
+        await getSuggestions(term);
+      }
+    },
+    [searchWithFilters, getSuggestions, navigateTo, pageInfo],
+  );
+
+  // Manejar selección de sugerencia
+  const handleSuggestionSelect = useCallback(
+    async suggestion => {
+      // Hacer búsqueda basada en el tipo de sugerencia
+      const searchFilters = {};
+
+      if (suggestion.type === 'cocktail') {
+        searchFilters.search = suggestion.suggestion;
+      } else if (suggestion.type === 'ingredient') {
+        searchFilters.ingredients = [suggestion.suggestion];
+      } else if (suggestion.type === 'category') {
+        searchFilters.category = suggestion.suggestion;
+      }
+
+      await searchWithFilters(searchFilters);
+
+      // Navegar a catálogo si no estamos allí
+      if (pageInfo.current !== 'catalogo') {
+        navigateTo('catalogo');
+      }
+    },
+    [searchWithFilters, navigateTo, pageInfo],
+  );
 
   return (
     <header className="flex-shrink-0 h-[76px] flex items-center justify-between p-4 px-6 border-b border-gray-200/80">
@@ -34,7 +78,13 @@ function Header() {
 
       {/* Middle: Search bar */}
       <div className="flex-1 max-w-lg">
-        <SearchBar onSearch={handleSearch} />
+        <AdvancedSearchBar
+          placeholder="Buscar cócteles..."
+          onSearch={handleSearch}
+          onSuggestionSelect={handleSuggestionSelect}
+          suggestions={suggestions}
+          loading={searchLoading}
+        />
       </div>
 
       {/* Right side: Action Icons */}

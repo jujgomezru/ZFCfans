@@ -278,3 +278,68 @@ ipcMain.handle('obtener-categorias-del-coctel', async (event, cocktailId) => {
     return { success: false, error: error.message };
   }
 });
+
+// ========== HANDLERS IPC PARA BÚSQUEDA AVANZADA ==========
+
+ipcMain.handle('buscar-cocteles-con-filtros', async (event, filters) => {
+  try {
+    const cocktails = cocktailRepository.searchWithFilters(filters);
+    return { success: true, data: cocktails };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('buscar-cocteles-por-ingredientes', async (event, ingredients) => {
+  try {
+    const cocktails = cocktailRepository.findByIngredients(ingredients);
+    return { success: true, data: cocktails };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('obtener-sugerencias-busqueda', async (event, term, limit = 10) => {
+  try {
+    const suggestions = cocktailRepository.getSearchSuggestions(term, limit);
+    return { success: true, data: suggestions };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('busqueda-fuzzy', async (event, searchTerm) => {
+  try {
+    const cocktails = cocktailRepository.fuzzySearch(searchTerm);
+    return { success: true, data: cocktails };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('buscar-cocteles-por-dificultad', async (event, difficulty) => {
+  try {
+    const cocktails = cocktailRepository.findByDifficulty(difficulty);
+    return { success: true, data: cocktails };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('buscar-cocteles-por-categoria', async (event, categoryId) => {
+  try {
+    const cocktails = cocktailRepository.findByCategory(categoryId);
+    return { success: true, data: cocktails };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('buscar-cocteles-por-alcohol', async (event, isAlcoholic) => {
+  try {
+    const cocktails = cocktailRepository.findByAlcoholContent(isAlcoholic);
+    return { success: true, data: cocktails };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});

@@ -46,6 +46,20 @@ contextBridge.exposeInMainWorld('electronAPI', {
   obtenerCategoriasDelCoctel: cocktailId =>
     ipcRenderer.invoke('obtener-categorias-del-coctel', cocktailId),
 
+  // BÚSQUEDA AVANZADA
+  buscarCoctelesConFiltros: filters => ipcRenderer.invoke('buscar-cocteles-con-filtros', filters),
+  buscarCoctelesPorIngredientes: ingredients =>
+    ipcRenderer.invoke('buscar-cocteles-por-ingredientes', ingredients),
+  obtenerSugerenciasBusqueda: (term, limit) =>
+    ipcRenderer.invoke('obtener-sugerencias-busqueda', term, limit),
+  busquedaFuzzy: searchTerm => ipcRenderer.invoke('busqueda-fuzzy', searchTerm),
+  buscarCoctelesPorDificultad: difficulty =>
+    ipcRenderer.invoke('buscar-cocteles-por-dificultad', difficulty),
+  buscarCoctelesPorCategoria: categoryId =>
+    ipcRenderer.invoke('buscar-cocteles-por-categoria', categoryId),
+  buscarCoctelesPorAlcohol: isAlcoholic =>
+    ipcRenderer.invoke('buscar-cocteles-por-alcohol', isAlcoholic),
+
   // GESTIÓN DE INGREDIENTES
   // GESTIÓN DE USUARIOS
   // GESTIÓN DE CONFIGURACIÓN

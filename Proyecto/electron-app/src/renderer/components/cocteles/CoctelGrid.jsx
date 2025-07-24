@@ -2,12 +2,30 @@ import { useEffect } from 'react';
 import CoctelCard from './CoctelCard';
 import { useCocktails } from '../../hooks/useCocktails';
 
-function CoctelGrid() {
-  const { cocktails, loading, error, loadCocktails } = useCocktails();
+function CoctelGrid({
+  cocktails: externalCocktails,
+  loading: externalLoading,
+  error: externalError,
+  emptyMessage = 'No hay cócteles disponibles.',
+}) {
+  const {
+    cocktails: internalCocktails,
+    loading: internalLoading,
+    error: internalError,
+    loadCocktails,
+  } = useCocktails();
+
+  // Si no se pasan cócteles externos, usar los internos
+  const cocktails = externalCocktails ?? internalCocktails;
+  const loading = externalLoading ?? internalLoading;
+  const error = externalError ?? internalError;
 
   useEffect(() => {
-    loadCocktails();
-  }, [loadCocktails]);
+    // Solo cargar cócteles internos si no se pasan externos
+    if (!externalCocktails) {
+      loadCocktails();
+    }
+  }, [loadCocktails, externalCocktails]);
 
   if (loading) {
     return (
@@ -22,7 +40,11 @@ function CoctelGrid() {
     return (
       <div className="text-center py-12">
         <p className="text-red-500 mb-4">Error: {error}</p>
-        <button onClick={loadCocktails} className="btn-secondary px-4 py-2 rounded-lg">
+        <button
+          onClick={externalCocktails ? undefined : loadCocktails}
+          className="btn-secondary px-4 py-2 rounded-lg"
+          disabled={!!externalCocktails}
+        >
           Reintentar
         </button>
       </div>
@@ -32,8 +54,10 @@ function CoctelGrid() {
   if (!cocktails || cocktails.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-500 text-lg">No hay cócteles disponibles.</p>
-        <p className="text-gray-400 text-sm mt-2">Crea tu primer cóctel para comenzar</p>
+        <p className="text-gray-500 text-lg">{emptyMessage}</p>
+        {!externalCocktails && (
+          <p className="text-gray-400 text-sm mt-2">Crea tu primer cóctel para comenzar</p>
+        )}
       </div>
     );
   }

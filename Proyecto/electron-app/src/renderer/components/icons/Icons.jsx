@@ -306,6 +306,23 @@ export const ForwardIcon = ({ className = 'w-5 h-5' }) => (
   </svg>
 );
 
+export const FilterIcon = ({ className = 'w-6 h-6' }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    className={className}
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+    strokeWidth="1.5"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M12 3c7.2 0 9 1.8 9 9s-1.8 9-9 9-9-1.8-9-9 1.8-9 9-9zM8 11.25L12 15l4-3.75"
+    />
+  </svg>
+);
+
 export const HeartIcon = ({ className = 'w-6 h-6', filled = false }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"

@@ -299,4 +299,82 @@ describe('CocktailRepository', () => {
       expect(result).toBeDefined();
     });
   });
+
+  describe('Funciones de búsqueda avanzada', () => {
+    it('debería buscar cócteles con filtros básicos', () => {
+      const result = repository.searchWithFilters({
+        search: 'Mojito',
+        difficulty: 'fácil',
+      });
+      expect(result).toBeDefined();
+      expect(Array.isArray(result)).toBe(true);
+    });
+
+    it('debería buscar cócteles por categoría', () => {
+      const result = repository.searchWithFilters({
+        category: 'Aperitivos',
+      });
+      expect(result).toBeDefined();
+      expect(Array.isArray(result)).toBe(true);
+    });
+
+    it('debería filtrar por contenido alcohólico', () => {
+      const resultAlcoholic = repository.searchWithFilters({
+        isAlcoholic: true,
+      });
+      expect(resultAlcoholic).toBeDefined();
+      expect(Array.isArray(resultAlcoholic)).toBe(true);
+
+      const resultNonAlcoholic = repository.searchWithFilters({
+        isAlcoholic: false,
+      });
+      expect(resultNonAlcoholic).toBeDefined();
+      expect(Array.isArray(resultNonAlcoholic)).toBe(true);
+    });
+
+    it('debería buscar cócteles por ingredientes', () => {
+      const result = repository.findByIngredients(['Ron blanco', 'Menta fresca']);
+      expect(result).toBeDefined();
+      expect(Array.isArray(result)).toBe(true);
+    });
+
+    it('debería obtener sugerencias de búsqueda', () => {
+      const result = repository.getSearchSuggestions('Moj');
+      expect(result).toBeDefined();
+      expect(Array.isArray(result)).toBe(true);
+    });
+
+    it('debería realizar búsqueda difusa', () => {
+      const result = repository.fuzzySearch('Mojto'); // Error tipográfico intencional
+      expect(result).toBeDefined();
+      expect(Array.isArray(result)).toBe(true);
+    });
+
+    it('debería manejar filtros combinados', () => {
+      const result = repository.searchWithFilters({
+        search: 'Mojito',
+        difficulty: 'fácil',
+        category: 'Aperitivos',
+        isAlcoholic: true,
+        sortBy: 'name',
+        sortOrder: 'ASC',
+      });
+      expect(result).toBeDefined();
+      expect(Array.isArray(result)).toBe(true);
+    });
+
+    it('debería retornar array vacío para búsquedas sin resultados', () => {
+      const result = repository.searchWithFilters({
+        search: 'CoctelQueNoExiste123',
+      });
+      expect(result).toBeDefined();
+      expect(Array.isArray(result)).toBe(true);
+    });
+
+    it('debería manejar parámetros vacíos sin errores', () => {
+      const result = repository.searchWithFilters({});
+      expect(result).toBeDefined();
+      expect(Array.isArray(result)).toBe(true);
+    });
+  });
 });

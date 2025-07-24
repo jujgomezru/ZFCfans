@@ -318,8 +318,8 @@ class CocktailRepository extends BaseRepository {
     const query = `
       SELECT 
         COUNT(*) as total_cocktails,
-        SUM(CASE WHEN is_alcoholic = 1 THEN 1 ELSE 0 END) as alcoholic_cocktails,
-        SUM(CASE WHEN is_alcoholic = 0 THEN 1 ELSE 0 END) as non_alcoholic_cocktails,
+        SUM(CASE WHEN alcohol_content > 0 THEN 1 ELSE 0 END) as alcoholic_cocktails,
+        SUM(CASE WHEN alcohol_content = 0 OR alcohol_content IS NULL THEN 1 ELSE 0 END) as non_alcoholic_cocktails,
         AVG(alcohol_content) as avg_alcohol_content,
         AVG(preparation_time) as avg_preparation_time
       FROM cocktails
@@ -355,18 +355,17 @@ class CocktailRepository extends BaseRepository {
         c.difficulty,
         c.preparation_time,
         c.alcohol_content,
-        c.is_alcoholic,
         c.img_url,
         GROUP_CONCAT(cat.name, ', ') AS categorias
       FROM cocktails c
       LEFT JOIN cocktail_categories cc ON c.id = cc.id_cocktail
       LEFT JOIN categories cat ON cc.id_category = cat.id
-      WHERE c.is_alcoholic = ?
+      WHERE ${isAlcoholic ? 'c.alcohol_content > 0' : '(c.alcohol_content = 0 OR c.alcohol_content IS NULL)'}
       GROUP BY c.id
       ORDER BY c.name
     `;
     const stmt = this.db.prepare(query);
-    return stmt.all(isAlcoholic ? 1 : 0);
+    return stmt.all();
   }
 
   /**
@@ -381,7 +380,6 @@ class CocktailRepository extends BaseRepository {
         c.difficulty,
         c.preparation_time,
         c.alcohol_content,
-        c.is_alcoholic,
         c.img_url,
         c.id_creator,
         GROUP_CONCAT(cat.name, ', ') AS categorias
@@ -454,6 +452,249 @@ class CocktailRepository extends BaseRepository {
       )
       .get(cocktailId);
     return row?.total_duration ?? 0;
+  }
+
+  /**
+   * Búsqueda avanzada de cócteles con múltiples filtros
+   * @param {Object} filters - Objeto con los filtros a aplicar
+   * @param {string} filters.search - Término de búsqueda por nombre o descripción
+   * @param {string} filters.difficulty - Filtro por dificultad
+   * @param {string} filters.category - Filtro por categoría
+   * @param {Array<string>} filters.ingredients - Filtro por ingredientes
+   * @param {boolean} filters.isAlcoholic - Filtro por contenido alcohólico
+   * @param {string} filters.sortBy - Campo para ordenar (name, difficulty, preparation_time)
+   * @param {string} filters.sortOrder - Orden ascendente o descendente (ASC, DESC)
+   */
+  searchWithFilters(filters = {}) {
+    const {
+      search,
+      difficulty,
+      category,
+      ingredients = [],
+      isAlcoholic,
+      sortBy = 'name',
+      sortOrder = 'ASC',
+    } = filters;
+
+    let query = `
+      SELECT DISTINCT
+        c.id,
+        c.name AS nombre,
+        c.img_url AS imagen,
+        c.difficulty,
+        c.description AS descripcion,
+        c.preparation_time,
+        c.alcohol_content,
+        r.glass_type,
+        GROUP_CONCAT(DISTINCT cat.name) AS categorias
+      FROM cocktails c
+      LEFT JOIN recipes r ON c.id = r.id_cocktail
+      LEFT JOIN cocktail_categories cc ON c.id = cc.id_cocktail
+      LEFT JOIN categories cat ON cc.id_category = cat.id
+      LEFT JOIN recipe_ingredients ri ON r.id = ri.id_recipe
+      LEFT JOIN ingredients ing ON ri.id_ingredient = ing.id
+      WHERE 1=1
+    `;
+
+    const params = [];
+    const conditions = [];
+
+    // Filtro por búsqueda de texto (nombre o descripción)
+    if (search && search.trim()) {
+      conditions.push('(c.name LIKE ? OR c.description LIKE ?)');
+      const searchPattern = `%${search.trim()}%`;
+      params.push(searchPattern, searchPattern);
+    }
+
+    // Filtro por dificultad
+    if (difficulty) {
+      conditions.push('c.difficulty = ?');
+      params.push(difficulty);
+    }
+
+    // Filtro por categoría
+    if (category) {
+      conditions.push('cat.name = ?');
+      params.push(category);
+    }
+
+    // Filtro por ingredientes
+    if (ingredients.length > 0) {
+      const ingredientConditions = ingredients.map(() => 'ing.name LIKE ?').join(' OR ');
+      conditions.push(`(${ingredientConditions})`);
+      ingredients.forEach(ingredient => {
+        params.push(`%${ingredient}%`);
+      });
+    }
+
+    // Filtro por contenido alcohólico
+    if (typeof isAlcoholic === 'boolean') {
+      if (isAlcoholic) {
+        conditions.push('c.alcohol_content > 0');
+      } else {
+        conditions.push('(c.alcohol_content = 0 OR c.alcohol_content IS NULL)');
+      }
+    }
+
+    // Agregar condiciones WHERE
+    if (conditions.length > 0) {
+      query += ` AND ${conditions.join(' AND ')}`;
+    }
+
+    // Agrupar por cóctel
+    query += ' GROUP BY c.id';
+
+    // Ordenamiento
+    const allowedSortFields = ['name', 'difficulty', 'preparation_time', 'alcohol_content'];
+    const allowedSortOrders = ['ASC', 'DESC'];
+
+    const safeSortBy = allowedSortFields.includes(sortBy) ? sortBy : 'name';
+    const safeSortOrder = allowedSortOrders.includes(sortOrder.toUpperCase())
+      ? sortOrder.toUpperCase()
+      : 'ASC';
+
+    // Orden especial para búsqueda por texto (relevancia)
+    if (search && search.trim()) {
+      query += `
+        ORDER BY 
+          CASE WHEN c.name LIKE ? THEN 1 ELSE 2 END,
+          c.${safeSortBy} ${safeSortOrder}
+      `;
+      params.push(`${search.trim()}%`);
+    } else {
+      query += ` ORDER BY c.${safeSortBy} ${safeSortOrder}`;
+    }
+
+    const stmt = this.db.prepare(query);
+    return stmt.all(...params);
+  }
+
+  /**
+   * Buscar cócteles por ingredientes específicos
+   */
+  findByIngredients(ingredientNames = []) {
+    if (ingredientNames.length === 0) {
+      return [];
+    }
+
+    // Construir placeholders para los ingredientes
+    const placeholders = ingredientNames.map(() => '?').join(',');
+
+    const query = `
+      SELECT DISTINCT
+        c.id,
+        c.name AS nombre,
+        c.img_url AS imagen,
+        c.difficulty,
+        c.description AS descripcion,
+        c.preparation_time,
+        COUNT(DISTINCT ing.id) as matching_ingredients,
+        GROUP_CONCAT(DISTINCT cat.name) AS categorias
+      FROM cocktails c
+      LEFT JOIN cocktail_categories cc ON c.id = cc.id_cocktail
+      LEFT JOIN categories cat ON cc.id_category = cat.id
+      LEFT JOIN recipes r ON c.id = r.id_cocktail
+      JOIN recipe_ingredients ri ON r.id = ri.id_recipe
+      JOIN ingredients ing ON ri.id_ingredient = ing.id
+      WHERE ing.name IN (${placeholders})
+      GROUP BY c.id
+      ORDER BY matching_ingredients DESC, c.name ASC
+    `;
+
+    const stmt = this.db.prepare(query);
+    return stmt.all(...ingredientNames);
+  }
+
+  /**
+   * Obtener sugerencias de autocompletar para búsqueda
+   */
+  getSearchSuggestions(term, limit = 10) {
+    if (!term || term.trim().length < 2) {
+      return [];
+    }
+
+    const searchPattern = `%${term.trim()}%`;
+
+    const query = `
+      SELECT DISTINCT
+        c.name AS suggestion,
+        'cocktail' AS type
+      FROM cocktails c
+      WHERE c.name LIKE ?
+      UNION
+      SELECT DISTINCT
+        ing.name AS suggestion,
+        'ingredient' AS type
+      FROM ingredients ing
+      WHERE ing.name LIKE ?
+      UNION
+      SELECT DISTINCT
+        cat.name AS suggestion,
+        'category' AS type
+      FROM categories cat
+      WHERE cat.name LIKE ?
+      ORDER BY suggestion ASC
+      LIMIT ?
+    `;
+
+    const stmt = this.db.prepare(query);
+    return stmt.all(searchPattern, searchPattern, searchPattern, limit);
+  }
+
+  /**
+   * Buscar cócteles con tolerancia a errores ortográficos simples
+   */
+  fuzzySearch(searchTerm, _threshold = 0.7) {
+    if (!searchTerm || searchTerm.trim().length < 3) {
+      return [];
+    }
+
+    // Para errores simples, usar LIKE con wildcards
+    const patterns = [
+      `%${searchTerm}%`, // Coincidencia exacta
+      `%${searchTerm.slice(0, -1)}%`, // Sin última letra
+      `%${searchTerm.slice(1)}%`, // Sin primera letra
+    ];
+
+    let query = `
+      SELECT DISTINCT
+        c.id,
+        c.name AS nombre,
+        c.img_url AS imagen,
+        c.difficulty,
+        c.description AS descripcion,
+        c.preparation_time,
+        GROUP_CONCAT(DISTINCT cat.name) AS categorias,
+        CASE 
+    `;
+
+    const params = [];
+
+    // Asignar puntuaciones de relevancia
+    patterns.forEach((pattern, index) => {
+      query += ` WHEN c.name LIKE ? THEN ${patterns.length - index}`;
+      params.push(pattern);
+    });
+
+    query += ` ELSE 0 END AS relevance_score
+      FROM cocktails c
+      LEFT JOIN cocktail_categories cc ON c.id = cc.id_cocktail
+      LEFT JOIN categories cat ON cc.id_category = cat.id
+      WHERE (`;
+
+    // Agregar condiciones OR para todos los patrones
+    const conditions = patterns.map(() => 'c.name LIKE ?').join(' OR ');
+    query += `${conditions})`;
+    params.push(...patterns);
+
+    query += `
+      GROUP BY c.id
+      HAVING relevance_score > 0
+      ORDER BY relevance_score DESC, c.name ASC
+    `;
+
+    const stmt = this.db.prepare(query);
+    return stmt.all(...params);
   }
 }
 
