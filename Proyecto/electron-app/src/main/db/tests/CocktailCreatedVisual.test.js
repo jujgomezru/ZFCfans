@@ -65,7 +65,7 @@ describe('CocktailCreatedVisual - legibilidad en la aplicación', () => {
   });
 
   test('los cócteles pueden ser listados y buscados por nombre', () => {
-    const search = (term) => cocktails.filter(c => c.name.toLowerCase().includes(term.toLowerCase()));
+    const search = term => cocktails.filter(c => c.name.toLowerCase().includes(term.toLowerCase()));
     expect(search('mojito').length).toBeGreaterThan(0);
     expect(search('piña').length).toBeGreaterThan(0);
     expect(search('colada').length).toBeGreaterThan(0);

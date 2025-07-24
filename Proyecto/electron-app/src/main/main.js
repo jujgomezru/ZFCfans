@@ -10,10 +10,9 @@ import { initializeDatabase } from './db/config/database.js';
 
 // Repositories
 import {
+  categoryRepository,
   cocktailRepository,
-  // TODO: Uncomment when needed
-  // categoryRepository,
-  // favoriteRepository,
+  favoriteRepository,
   // ingredientRepository,
   // notificationRepository,
   recipeRepository,
@@ -156,5 +155,126 @@ ipcMain.handle('obtener-receta-completa', async (_event, cocktailId) => {
   } catch (err) {
     logger.error('Error en handler obtener-receta-completa:', err);
     throw err;
+  }
+});
+
+// ========== HANDLERS IPC PARA FAVORITOS ==========
+
+ipcMain.handle('obtener-favoritos', async (event, userId) => {
+  try {
+    const favorites = favoriteRepository.findByUserId(userId);
+    return { success: true, data: favorites };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('es-favorito', async (event, userId, cocktailId) => {
+  try {
+    const isFav = favoriteRepository.isFavorite(userId, cocktailId);
+    return { success: true, data: isFav };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('toggle-favorito', async (event, userId, cocktailId) => {
+  try {
+    const result = favoriteRepository.toggleFavorite(userId, cocktailId);
+    return { success: true, data: result };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('agregar-favorito', async (event, userId, cocktailId) => {
+  try {
+    const result = favoriteRepository.addFavorite(userId, cocktailId);
+    return { success: true, data: result };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('remover-favorito', async (event, userId, cocktailId) => {
+  try {
+    const result = favoriteRepository.removeFavorite(userId, cocktailId);
+    return { success: true, data: result };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+// ========== HANDLERS IPC PARA CATEGORÍAS ==========
+
+ipcMain.handle('obtener-categorias', async () => {
+  try {
+    const categories = categoryRepository.findAll();
+    return { success: true, data: categories };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('obtener-categorias-del-sistema', async () => {
+  try {
+    const categories = categoryRepository.findSystemCategories();
+    return { success: true, data: categories };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('obtener-categorias-del-usuario', async (event, userId) => {
+  try {
+    const categories = categoryRepository.findUserCategories(userId);
+    return { success: true, data: categories };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('crear-categoria', async (event, categoryData) => {
+  try {
+    const result = categoryRepository.createCategory(categoryData);
+    return { success: true, data: result };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('obtener-cocteles-de-categoria', async (event, categoryId) => {
+  try {
+    const cocktails = categoryRepository.getCocktails(categoryId);
+    return { success: true, data: cocktails };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('agregar-coctel-a-categoria', async (event, cocktailId, categoryId) => {
+  try {
+    const result = cocktailRepository.addToCategory(cocktailId, categoryId);
+    return { success: true, data: result };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('remover-coctel-de-categoria', async (event, cocktailId, categoryId) => {
+  try {
+    const result = cocktailRepository.removeFromCategory(cocktailId, categoryId);
+    return { success: true, data: result };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('obtener-categorias-del-coctel', async (event, cocktailId) => {
+  try {
+    const categories = cocktailRepository.getCategoriesForCocktail(cocktailId);
+    return { success: true, data: categories };
+  } catch (error) {
+    return { success: false, error: error.message };
   }
 });

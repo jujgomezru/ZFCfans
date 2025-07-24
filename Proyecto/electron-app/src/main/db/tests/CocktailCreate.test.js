@@ -1,7 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
 describe('CocktailRepository.create - edge cases', () => {
-
   test('should not allow duplicate ingredient in cocktail', () => {
     const cocktailData = {
       name: 'Test Cocktail',
