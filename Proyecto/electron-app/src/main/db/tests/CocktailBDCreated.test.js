@@ -1,4 +1,4 @@
-import { describe, expect, test, beforeEach, vi } from 'vitest';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 // Mock del módulo de base de datos para evitar inicialización real
 vi.mock('../config/database.js', () => ({
   getDb: () => mockDb,

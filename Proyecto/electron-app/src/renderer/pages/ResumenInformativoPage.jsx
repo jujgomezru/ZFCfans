@@ -1,33 +1,33 @@
-import { useEffect, useState } from 'react';
 import { useNavigation } from '../context/NavigationContext';
+import { useRecipe } from '../hooks/useRecipe';
 import Descripcion from '../components/resumen/Descripcion';
 import Instructivo from '../components/resumen/Instructivo';
 
 function ResumenInformativoPage() {
   const { params, navigateTo } = useNavigation();
   const { recipeId, nombre: coctelNombre, imagen: coctelImagen } = params;
-  const [recipe, setRecipe] = useState(null);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    if (!recipeId) {
-      return;
-    }
-    (async () => {
-      try {
-        const data = await window.electronAPI.obtenerRecetaCompleta(recipeId);
-        if (data) {
-          setRecipe(data);
-        } else {
-          setError('Receta no encontrada');
-        }
-      } catch (e) {
-        setError(e.message);
-      }
-    })();
-  }, [recipeId]);
+  
+  // Usar el hook personalizado para gestión de recetas
+  const { recipe, loading, error } = useRecipe(recipeId);
 
   const handleClose = () => navigateTo('catalogo');
+
+  if (loading) {
+    return (
+      <div className="p-8">
+        <button
+          onClick={handleClose}
+          className="focus-ring p-2 rounded-full hover:bg-gray-200 text-gray-600"
+        >
+          ×
+        </button>
+        <div className="flex justify-center items-center mt-8">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500" />
+        </div>
+        <p className="text-center mt-4 text-gray-600">Cargando receta...</p>
+      </div>
+    );
+  }
 
   if (error) {
     return (
@@ -52,7 +52,7 @@ function ResumenInformativoPage() {
         >
           ×
         </button>
-        <p className="text-gray-500 mt-4">Cargando...</p>
+        <p className="text-gray-500 mt-4">No se encontró la receta solicitada</p>
       </div>
     );
   }
@@ -68,15 +68,15 @@ function ResumenInformativoPage() {
           ×
         </button>
       </div>
-      {/* Pasa nombre e imagen desde params */}
+      {/* Pasa nombre e imagen desde params, datos de receta desde hook */}
       <Descripcion
-        name={coctelNombre}
-        image={coctelImagen}
+        name={coctelNombre || recipe.name}
+        image={coctelImagen || recipe.img_url}
         difficulty={recipe.difficulty}
         preparationTime={recipe.preparation_time}
         glassType={recipe.glass_type}
       />
-      <Instructivo steps={recipe.steps} />
+      <Instructivo steps={recipe.pasos || recipe.steps || []} />
     </>
   );
 }

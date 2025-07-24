@@ -2,6 +2,9 @@ import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+// Utilities
+import Logger from './utils/logger.js';
+
 // Database setup
 import { initializeDatabase } from './db/config/database.js';
 
@@ -20,6 +23,9 @@ import {
 // Get __dirname equivalent in ESM
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Initialize logger
+const logger = new Logger('Main');
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -59,7 +65,7 @@ app.on('activate', () => {
   }
 });
 
-console.log('ZFCocteles iniciado correctamente 🥂');
+logger.info('ZFCocteles iniciado correctamente 🥂');
 
 // Canales IPC para gestión de cócteles
 ipcMain.on('guardar-coctel', (event, coctel) => {
@@ -81,7 +87,13 @@ ipcMain.handle('obtener-cocteles', async () => {
 
 ipcMain.handle('obtener-coctel', async (event, id) => {
   try {
-    const coctel = cocktailRepository.findCompleteById(id);
+    // Validación de entrada
+    if (!id || isNaN(parseInt(id))) {
+      return { success: false, error: 'ID de cóctel inválido' };
+    }
+    const cocktailId = parseInt(id);
+    
+    const coctel = cocktailRepository.findCompleteById(cocktailId);
     return { success: true, data: coctel };
   } catch (error) {
     return { success: false, error: error.message };
@@ -108,12 +120,18 @@ ipcMain.handle('obtener-estadisticas', async () => {
 
 ipcMain.handle('obtener-receta-completa', async (_event, cocktailId) => {
   try {
-    console.log('📋 obtener-receta-completa llamado con cocktailId=', cocktailId);
+    logger.debug('📋 obtener-receta-completa llamado con cocktailId=', cocktailId);
+
+    // Validación de entrada
+    if (!cocktailId || isNaN(parseInt(cocktailId))) {
+      throw new Error('ID de cóctel inválido');
+    }
+    const id = parseInt(cocktailId);
 
     // 1) Busca la fila de recipes asociada al cóctel
-    const rec = recipeRepository.findByCocktailId(cocktailId);
+    const rec = recipeRepository.findByCocktailId(id);
     if (!rec || !rec.id) {
-      console.warn(`⚠️ No existe receta para cocktailId=${cocktailId}`);
+      logger.warn(`⚠️ No existe receta para cocktailId=${id}`);
       return null;
     }
 
@@ -124,8 +142,8 @@ ipcMain.handle('obtener-receta-completa', async (_event, cocktailId) => {
     }
 
     // 3) Enriquecer con difficulty (de cocktails) y duration total (suma de recipe_steps)
-    const difficulty = cocktailRepository.getDifficulty(cocktailId);
-    const totalDuration = cocktailRepository.getTotalDuration(cocktailId);
+    const difficulty = cocktailRepository.getDifficulty(id);
+    const totalDuration = cocktailRepository.getTotalDuration(id);
 
     // 4) Devolver un único objeto con todo
     return {
@@ -134,7 +152,7 @@ ipcMain.handle('obtener-receta-completa', async (_event, cocktailId) => {
       preparation_time: totalDuration,
     };
   } catch (err) {
-    console.error('Error en handler obtener-receta-completa:', err);
+    logger.error('Error en handler obtener-receta-completa:', err);
     throw err;
   }
 });
