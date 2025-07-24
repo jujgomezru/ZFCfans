@@ -69,6 +69,37 @@ class BaseRepository {
     return result.changes;
   }
 
+  getOrCreateIngredientId(name) {
+  if (!name || name.trim() === "") {
+    throw new Error("El nombre del ingrediente no puede estar vacío");
+  }
+
+  const nameTrimmed = name.trim();
+
+  const stmtSelect = this.db.prepare(`SELECT id FROM ingredients WHERE name = ?`);
+  const existing = stmtSelect.get(nameTrimmed);
+
+  if (existing && existing.id) {
+    return existing.id;
+  }
+
+  // ✅ Insertar ingrediente con todos los campos requeridos
+  const stmtInsert = this.db.prepare(`
+    INSERT INTO ingredients (name, type, category, description, alcohol_content)
+    VALUES (?, ?, ?, ?, ?)
+  `);
+
+  const result = stmtInsert.run(
+    nameTrimmed,
+    "esencial",   // tipo por defecto
+    "otro",       // categoría por defecto
+    null,         // descripción
+    0.0,           // alcohol por defecto
+  );
+
+  return result.lastInsertRowid;
+}
+
   /**
    * Contar registros
    */

@@ -1,3 +1,39 @@
+// import { ipcMain } from 'electron'; // Eliminada porque ya está importada arriba
+import CocktailRepository from './db/repositories/CocktailRepository.js';
+import db from './db/index.js';
+
+const cocktailRepo = new CocktailRepository(db);
+
+// Handler para crear cócteles
+ipcMain.handle('crear-coctel', async (event, datos) => {
+  try {
+    // Transformar ingredientes y pasos si es necesario
+    const ingredientes = datos.ingredientes.map(ing => ({
+      name: ing.name,
+      quantity: ing.quantity,
+      unit: ing.unit,
+      // agrega más campos si tu repo lo requiere
+    }));
+    const pasos = datos.pasos.map((step, idx) => ({
+      step_number: idx + 1,
+      instruction: step.instruction,
+      duration: step.duration,
+      // agrega más campos si tu repo lo requiere
+    }));
+
+    // Construir el objeto final para el repositorio
+    const cocktailData = {
+      ...datos,
+      ingredientes,
+      pasos,
+    };
+
+    const id = cocktailRepo.createComplete(cocktailData);
+    return { ok: true, id };
+  } catch (error) {
+    return { ok: false, error: error.message };
+  }
+});
 import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'path';
 import { fileURLToPath } from 'url';

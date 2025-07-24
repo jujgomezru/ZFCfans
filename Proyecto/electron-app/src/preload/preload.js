@@ -22,6 +22,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
   obtenerRecetaCompleta: recipeId =>
     ipcRenderer.invoke('obtener-receta-completa', recipeId),
 
+  crearCoctel: (form) => 
+    ipcRenderer.invoke('crear-coctel', form),
+
+  
   // GESTIÓN DE CATEGORÍAS
   // GESTIÓN DE INGREDIENTES
   // GESTIÓN DE USUARIOS

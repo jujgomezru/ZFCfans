@@ -182,109 +182,126 @@ class CocktailRepository extends BaseRepository {
    * Crear cóctel completo con ingredientes y pasos
    */
   createComplete(cocktailData) {
-    const transaction = this.db.transaction(() => {
-      // 1. Crear el cóctel (sin id_category)
-      const cocktailId = this.create({
-        name: cocktailData.name,
-        img_url: cocktailData.img_url || null,
-        difficulty: cocktailData.difficulty,
-        description: cocktailData.description || null,
-        additional_notes: cocktailData.additional_notes || null,
-        preparation_time: cocktailData.preparation_time || null,
-        servings: cocktailData.servings || 1,
-        alcohol_content: cocktailData.alcohol_content || null,
-        is_featured: cocktailData.is_featured || 0,
-        id_owner: cocktailData.id_owner || null,
-        id_pairing: cocktailData.id_pairing || null,
-      });
+  // Activar claves foráneas (muy importante en SQLite)
+  this.db.pragma('foreign_keys = ON');
 
-      // 2. Crear la receta
-      const recipeStmt = this.db.prepare(`
-        INSERT INTO recipes (id_cocktail, glass_type, garnish, serving_suggestion)
-        VALUES (?, ?, ?, ?)
-      `);
-
-      const recipeResult = recipeStmt.run(
-        cocktailId,
-        cocktailData.glass_type || null,
-        cocktailData.garnish || null,
-        cocktailData.serving_suggestion || null,
-      );
-
-      const recipeId = recipeResult.lastInsertRowid;
-
-      // 3. Agregar ingredientes si existen
-      if (cocktailData.ingredientes && cocktailData.ingredientes.length > 0) {
-        const ingredientStmt = this.db.prepare(`
-          INSERT INTO recipe_ingredients 
-          (id_recipe, id_ingredient, quantity, unit, preparation_note, is_optional, order_index)
-          VALUES (?, ?, ?, ?, ?, ?, ?)
-        `);
-
-        cocktailData.ingredientes.forEach((ingrediente, index) => {
-          ingredientStmt.run(
-            recipeId,
-            ingrediente.id_ingredient,
-            ingrediente.quantity,
-            ingrediente.unit,
-            ingrediente.preparation_note || null,
-            ingrediente.is_optional || 0,
-            ingrediente.order_index || index,
-          );
-        });
-      }
-
-      // 4. Agregar pasos si existen
-      if (cocktailData.pasos && cocktailData.pasos.length > 0) {
-        const stepStmt = this.db.prepare(`
-          INSERT INTO recipe_steps (id_recipe, step_number, instruction, duration, is_critical)
-          VALUES (?, ?, ?, ?, ?)
-        `);
-
-        cocktailData.pasos.forEach((paso, index) => {
-          stepStmt.run(
-            recipeId,
-            paso.step_number || index + 1,
-            paso.instruction,
-            paso.duration || null,
-            paso.is_critical || 0,
-          );
-        });
-      }
-
-      // 5. Agregar categorías si existen (ahora todas van por cocktail_categories)
-      const categoryStmt = this.db.prepare(`
-        INSERT INTO cocktail_categories (id_cocktail, id_category)
-        VALUES (?, ?)
-      `);
-
-      // Agregar categoría principal si existe
-      if (cocktailData.id_category) {
-        categoryStmt.run(cocktailId, cocktailData.id_category);
-      }
-
-      // Agregar categorías adicionales si existen
-      if (cocktailData.categorias_adicionales && cocktailData.categorias_adicionales.length > 0) {
-        cocktailData.categorias_adicionales.forEach(categoryId => {
-          // Evitar duplicar la categoría principal
-          if (categoryId !== cocktailData.id_category) {
-            categoryStmt.run(cocktailId, categoryId);
-          }
-        });
-      }
-
-      // Agregar categorías directamente si se especifican
-      if (cocktailData.categorias && cocktailData.categorias.length > 0) {
-        cocktailData.categorias.forEach(categoryId => {
-          categoryStmt.run(cocktailId, categoryId);
-        });
-      }
-
-      return cocktailId;
+  const transaction = this.db.transaction(() => {
+    // 1. Crear el cóctel
+    const cocktailId = this.create({
+      name: cocktailData.name,
+      img_url: cocktailData.img_url || null,
+      difficulty: cocktailData.difficulty,
+      description: cocktailData.description || null,
+      additional_notes: cocktailData.additional_notes || null,
+      preparation_time: cocktailData.preparation_time || null,
+      servings: cocktailData.servings || 1,
+      alcohol_content: cocktailData.alcohol_content || null,
+      is_featured: cocktailData.is_featured || 0,
+      id_owner: cocktailData.id_owner || null,
+      id_pairing: cocktailData.id_pairing || null,
     });
 
-    return transaction();
-  }
+    // 2. Crear receta
+    const recipeStmt = this.db.prepare(`
+      INSERT INTO recipes (id_cocktail, glass_type, garnish, serving_suggestion)
+      VALUES (?, ?, ?, ?)
+    `);
+
+    recipeStmt.run(
+      cocktailId,
+      cocktailData.glass_type || null,
+      cocktailData.garnish || null,
+      cocktailData.serving_suggestion || null,
+    );
+
+    // ✅ Asegurar el ID correcto de la receta
+    const recipeId = this.db.prepare(`SELECT last_insert_rowid() as id`).get().id;
+
+    // 3. Insertar ingredientes
+    if (cocktailData.ingredientes && cocktailData.ingredientes.length > 0) {
+      const ingredientStmt = this.db.prepare(`
+        INSERT INTO recipe_ingredients 
+        (id_recipe, id_ingredient, quantity, unit, preparation_note, is_optional, order_index)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      `);
+
+      cocktailData.ingredientes.forEach((ingrediente, index) => {
+        const ingredientId = this.getOrCreateIngredientId(ingrediente.name);
+
+        // Validación defensiva
+        if (!ingredientId || !recipeId) {
+          throw new Error(`Error: id_ingredient o id_recipe inválido`);
+        }
+
+         // 🧪 Agrega este bloque justo antes de insertar
+        console.log("DEBUG: Validando claves foráneas");
+        console.log("ID de receta:", recipeId);
+        console.log("ID de ingrediente:", ingredientId);
+        console.log("¿Existe la receta?",
+          this.db.prepare("SELECT id FROM recipes WHERE id = ?").get(recipeId));
+        console.log("¿Existe el ingrediente?",
+          this.db.prepare("SELECT id FROM ingredients WHERE id = ?").get(ingredientId));
+
+        ingredientStmt.run(
+          recipeId,
+          ingredientId,
+          ingrediente.quantity,
+          ingrediente.unit,
+          ingrediente.preparation_note || null,
+          ingrediente.is_optional || 0,
+          ingrediente.order_index || index,
+        );
+      });
+    }
+
+    // 4. Insertar pasos
+    if (cocktailData.pasos && cocktailData.pasos.length > 0) {
+      const stepStmt = this.db.prepare(`
+        INSERT INTO recipe_steps (id_recipe, step_number, instruction, duration, is_critical)
+        VALUES (?, ?, ?, ?, ?)
+      `);
+
+      cocktailData.pasos.forEach((paso, index) => {
+        stepStmt.run(
+          recipeId,
+          paso.step_number || index + 1,
+          paso.instruction,
+          paso.duration || null,
+          paso.is_critical || 0,
+        );
+      });
+    }
+
+    // 5. Insertar categorías
+    const categoryStmt = this.db.prepare(`
+      INSERT INTO cocktail_categories (id_cocktail, id_category)
+      VALUES (?, ?)
+    `);
+
+    if (cocktailData.id_category) {
+      categoryStmt.run(cocktailId, cocktailData.id_category);
+    }
+
+    if (cocktailData.categorias_adicionales && cocktailData.categorias_adicionales.length > 0) {
+      cocktailData.categorias_adicionales.forEach(categoryId => {
+        if (categoryId !== cocktailData.id_category) {
+          categoryStmt.run(cocktailId, categoryId);
+        }
+      });
+    }
+
+    if (cocktailData.categorias && cocktailData.categorias.length > 0) {
+      cocktailData.categorias.forEach(categoryId => {
+        categoryStmt.run(cocktailId, categoryId);
+      });
+    }
+
+    return cocktailId;
+  });
+
+  return transaction();
+}
+
 
   /**
    * Obtener cócteles destacados
