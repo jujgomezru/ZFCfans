@@ -19,8 +19,7 @@ export function useRecipe(cocktailId) {
     setError(null);
     try {
       const data = await RecipeController.getCompleteRecipe(cocktailId);
-      const formattedData = RecipeController.formatRecipeForDisplay(data);
-      setRecipe(formattedData);
+      setRecipe(data);
     } catch (err) {
       setError(err.message);
       setRecipe(null);
@@ -48,7 +47,7 @@ export function useRecipe(cocktailId) {
 export function useRecipeValidation() {
   const [validationResult, setValidationResult] = useState(null);
 
-  const validateRecipe = useCallback((recipeData) => {
+  const validateRecipe = useCallback(recipeData => {
     const result = RecipeController.validateRecipeData(recipeData);
     setValidationResult(result);
     return result;

@@ -14,10 +14,9 @@ class RecipeController {
       }
 
       const recipe = await window.electronAPI.obtenerRecetaCompleta(cocktailId);
-      if (!recipe) {
-        throw new Error('Receta no encontrada');
-      }
 
+      // El backend puede devolver null legítimamente si no encuentra la receta
+      // No arrojamos error en este caso, solo devolvemos null
       return recipe;
     } catch (error) {
       // En el frontend usamos console.error para debugging
@@ -83,18 +82,20 @@ class RecipeController {
     return {
       ...recipe,
       // Asegurar que los ingredientes tengan el formato correcto
-      ingredientes: recipe.ingredientes?.map(ingredient => ({
-        ...ingredient,
-        cantidad: ingredient.cantidad || ingredient.quantity,
-        nombre: ingredient.nombre || ingredient.name,
-        unidad: ingredient.unidad || ingredient.unit,
-      })) || [],
+      ingredientes:
+        recipe.ingredientes?.map(ingredient => ({
+          ...ingredient,
+          cantidad: ingredient.cantidad || ingredient.quantity,
+          nombre: ingredient.nombre || ingredient.name,
+          unidad: ingredient.unidad || ingredient.unit,
+        })) || [],
       // Asegurar que los pasos tengan el formato correcto
-      pasos: recipe.pasos?.map(step => ({
-        ...step,
-        instruccion: step.instruccion || step.instruction,
-        numero: step.numero || step.step_number,
-      })) || [],
+      pasos:
+        recipe.pasos?.map(step => ({
+          ...step,
+          instruccion: step.instruccion || step.instruction,
+          numero: step.numero || step.step_number,
+        })) || [],
     };
   }
 }

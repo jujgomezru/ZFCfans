@@ -92,7 +92,7 @@ ipcMain.handle('obtener-coctel', async (event, id) => {
       return { success: false, error: 'ID de cóctel inválido' };
     }
     const cocktailId = parseInt(id);
-    
+
     const coctel = cocktailRepository.findCompleteById(cocktailId);
     return { success: true, data: coctel };
   } catch (error) {
@@ -120,8 +120,6 @@ ipcMain.handle('obtener-estadisticas', async () => {
 
 ipcMain.handle('obtener-receta-completa', async (_event, cocktailId) => {
   try {
-    logger.debug('📋 obtener-receta-completa llamado con cocktailId=', cocktailId);
-
     // Validación de entrada
     if (!cocktailId || isNaN(parseInt(cocktailId))) {
       throw new Error('ID de cóctel inválido');
@@ -130,6 +128,7 @@ ipcMain.handle('obtener-receta-completa', async (_event, cocktailId) => {
 
     // 1) Busca la fila de recipes asociada al cóctel
     const rec = recipeRepository.findByCocktailId(id);
+
     if (!rec || !rec.id) {
       logger.warn(`⚠️ No existe receta para cocktailId=${id}`);
       return null;
@@ -137,6 +136,7 @@ ipcMain.handle('obtener-receta-completa', async (_event, cocktailId) => {
 
     // 2) Con ese recipe.id, trae los detalles básicos (ingredientes, pasos, etc.)
     const complete = await recipeRepository.getComplete(rec.id);
+
     if (!complete) {
       return null;
     }
@@ -146,11 +146,13 @@ ipcMain.handle('obtener-receta-completa', async (_event, cocktailId) => {
     const totalDuration = cocktailRepository.getTotalDuration(id);
 
     // 4) Devolver un único objeto con todo
-    return {
+    const result = {
       ...complete,
       difficulty,
       preparation_time: totalDuration,
     };
+
+    return result;
   } catch (err) {
     logger.error('Error en handler obtener-receta-completa:', err);
     throw err;

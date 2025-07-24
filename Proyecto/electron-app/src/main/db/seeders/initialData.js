@@ -141,6 +141,183 @@ export function insertInitialCocktails(db, force = false) {
         ],
       },
     },
+    // ===== DATOS DE PRUEBA PARA TESTING DE UI =====
+    {
+      name: 'Test: Cóctel Completo',
+      img_url: 'https://images.unsplash.com/photo-1544145945-f90425340c7e?w=300&h=300&fit=crop',
+      difficulty: 'difícil',
+      description: 'Cóctel de prueba con TODOS los datos completos para testing',
+      category_name: 'digestivo',
+      recipe: {
+        glass_type: 'coupe_glass',
+        garnish: 'Twist de naranja flambeado',
+        serving_suggestion: 'Servir muy frío con decoración elaborada',
+        preparation_time: 8,
+        ingredients: [
+          {
+            name: 'Whisky Premium',
+            qty: 2,
+            unit: 'oz',
+            optional: false,
+            notes: 'Preferiblemente añejado',
+          },
+          {
+            name: 'Licor de hierbas',
+            qty: 0.5,
+            unit: 'oz',
+            optional: false,
+            notes: 'Temperatura ambiente',
+          },
+          {
+            name: 'Jarabe simple',
+            qty: 0.25,
+            unit: 'oz',
+            optional: true,
+            notes: 'Solo si se prefiere más dulce',
+          },
+          {
+            name: 'Bitters aromáticos',
+            qty: 2,
+            unit: 'dashes',
+            optional: false,
+            notes: 'Agregar al final',
+          },
+          {
+            name: 'Hielo de calidad',
+            qty: 1,
+            unit: 'cup',
+            optional: false,
+            notes: 'Hielo grande y claro',
+          },
+        ],
+        steps: [
+          {
+            instruction: 'Enfriar la copa coupe en el congelador por 5 minutos antes de servir',
+            duration: 5,
+            critical: false,
+          },
+          {
+            instruction:
+              'En un vaso mezclador, añadir el whisky y el licor de hierbas con hielo abundante',
+            duration: 1,
+            critical: true,
+          },
+          {
+            instruction:
+              'Remover vigorosamente durante 30 segundos hasta alcanzar la dilución perfecta',
+            duration: 0.5,
+            critical: true,
+          },
+          {
+            instruction: 'Probar y ajustar dulzor con jarabe si es necesario (paso opcional)',
+            duration: 1,
+            critical: false,
+          },
+          {
+            instruction:
+              'Colar con colador fino en la copa fría, eliminando cualquier rastro de hielo',
+            duration: 1,
+            critical: true,
+          },
+          {
+            instruction: 'Añadir 2 dashes de bitters aromáticos sobre la superficie',
+            duration: 0.5,
+            critical: false,
+          },
+          {
+            instruction: 'Flamear el twist de naranja sobre la copa y colocar como decoración',
+            duration: 1,
+            critical: false,
+          },
+          {
+            instruction: 'Servir inmediatamente mientras está a temperatura perfecta',
+            duration: 0,
+            critical: true,
+          },
+        ],
+      },
+    },
+    {
+      name: 'Test: Sin Imagen',
+      img_url: '', // Imagen vacía para probar fallback
+      difficulty: 'fácil',
+      description: 'Prueba del sistema de imagen por defecto cuando no hay URL',
+      category_name: 'aperitivo',
+      recipe: {
+        glass_type: 'highball_glass',
+        preparation_time: 2,
+        ingredients: [
+          { name: 'Agua mineral', qty: 200, unit: 'ml' },
+          { name: 'Limón', qty: 0.5, unit: 'unidad' },
+          { name: 'Hielo', qty: 5, unit: 'cubos' },
+        ],
+        steps: [
+          { instruction: 'Llenar el vaso con hielo', duration: 1, critical: false },
+          { instruction: 'Añadir agua mineral y jugo de limón', duration: 1, critical: false },
+          { instruction: 'Mezclar suavemente y servir', duration: 0.5, critical: false },
+        ],
+      },
+    },
+    {
+      name: 'Test: Solo Ingredientes',
+      img_url: 'https://images.unsplash.com/photo-1536935338788-846bb9981813?w=300&h=300&fit=crop',
+      difficulty: 'media',
+      description: 'Cóctel para probar UI cuando NO hay pasos de preparación',
+      category_name: 'dulce',
+      recipe: {
+        glass_type: 'martini_glass',
+        garnish: 'Cereza al marrasquino',
+        preparation_time: 3,
+        ingredients: [
+          { name: 'Vodka premium', qty: 2, unit: 'oz', notes: 'Bien frío' },
+          { name: 'Licor de cereza', qty: 0.5, unit: 'oz', optional: true },
+          { name: 'Jugo de cranberry', qty: 1, unit: 'oz' },
+          { name: 'Jugo de lima fresco', qty: 0.25, unit: 'oz' },
+        ],
+        steps: [], // Array vacío para probar UI sin pasos
+      },
+    },
+    {
+      name: 'Test: Solo Pasos',
+      img_url: 'https://images.unsplash.com/photo-1544145945-f90425340c7e?w=300&h=300&fit=crop',
+      difficulty: 'media',
+      description: 'Cóctel para probar UI cuando NO hay lista de ingredientes',
+      category_name: 'digestivo',
+      recipe: {
+        glass_type: 'rocks_glass',
+        preparation_time: 4,
+        ingredients: [], // Array vacío para probar UI sin ingredientes
+        steps: [
+          {
+            instruction: 'Este es un cóctel misterioso donde solo conoces los pasos',
+            duration: 1,
+            critical: false,
+          },
+          {
+            instruction: 'Paso para probar la navegación cuando faltan ingredientes',
+            duration: 2,
+            critical: true,
+          },
+          {
+            instruction: 'Verificar que la UI maneja elegantemente la falta de ingredientes',
+            duration: 1,
+            critical: false,
+          },
+        ],
+      },
+    },
+    {
+      name: 'Test: Datos Mínimos',
+      img_url: null, // null para probar otro caso de fallback
+      difficulty: 'fácil', // Sin badge especial, pero valor válido
+      description: 'Cóctel con datos mínimos para probar todos los fallbacks',
+      category_name: 'aperitivo',
+      recipe: {
+        // Solo datos mínimos
+        ingredients: [{ name: 'Ingrediente básico', qty: 1, unit: 'unidad' }],
+        steps: [{ instruction: 'Paso básico de preparación' }],
+      },
+    },
     {
       name: 'Margarita',
       img_url: 'https://placehold.co/192x192/E2E8F0/4A5568?text=Margarita',
@@ -231,8 +408,8 @@ export function insertInitialCocktails(db, force = false) {
   `);
 
   const insertCocktailStmt = db.prepare(`
-    INSERT INTO cocktails (name, img_url, difficulty, description, id_owner)
-    VALUES (?, ?, ?, ?, ?)
+    INSERT INTO cocktails (name, img_url, difficulty, description, preparation_time, id_owner)
+    VALUES (?, ?, ?, ?, ?, ?)
   `);
 
   const insertCocktailCategory = db.prepare(`
@@ -246,7 +423,7 @@ export function insertInitialCocktails(db, force = false) {
   const getIngredientId = db.prepare(`SELECT id FROM ingredients WHERE name = ? LIMIT 1`);
   const insertRecipeIngredient = db.prepare(`
     INSERT INTO recipe_ingredients (id_recipe, id_ingredient, quantity, unit, preparation_note, is_optional, order_index)
-    VALUES (?, ?, ?, ?, ?, 0, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
   `);
   const insertRecipeStep = db.prepare(`
     INSERT INTO recipe_steps (id_recipe, step_number, instruction, duration, is_critical)
@@ -267,7 +444,14 @@ export function insertInitialCocktails(db, force = false) {
 
   // 9. Insertar cócteles y recetas dinámicamente
   cocktails.forEach(c => {
-    const info = insertCocktailStmt.run(c.name, c.img_url, c.difficulty, c.description, demoUserId);
+    const info = insertCocktailStmt.run(
+      c.name,
+      c.img_url,
+      c.difficulty,
+      c.description,
+      c.recipe?.preparation_time || null,
+      demoUserId,
+    );
 
     const catId = getCategoryId.get(c.category_name).id;
     insertCocktailCategory.run(info.lastInsertRowid, catId);
@@ -275,22 +459,40 @@ export function insertInitialCocktails(db, force = false) {
     if (c.recipe) {
       const recInfo = insertRecipeStmt.run(
         info.lastInsertRowid,
-        c.recipe.glass_type,
-        c.recipe.garnish,
-        c.recipe.serving_suggestion,
+        c.recipe.glass_type || null,
+        c.recipe.garnish || null,
+        c.recipe.serving_suggestion || null,
       );
       const recipeId = recInfo.lastInsertRowid;
 
       // ingredients
-      c.recipe.ingredients.forEach((ing, idx) => {
-        const ingId = getIngredientId.get(ing.name).id;
-        insertRecipeIngredient.run(recipeId, ingId, ing.qty, ing.unit, '', idx + 1);
-      });
+      if (c.recipe.ingredients && c.recipe.ingredients.length > 0) {
+        c.recipe.ingredients.forEach((ing, idx) => {
+          const ingResult = getIngredientId.get(ing.name);
+          if (ingResult) {
+            insertRecipeIngredient.run(
+              recipeId,
+              ingResult.id,
+              ing.qty,
+              ing.unit,
+              ing.notes || '',
+              ing.optional ? 1 : 0,
+              idx + 1,
+            );
+          }
+        });
+      }
 
       // steps
-      c.recipe.steps.forEach((instr, idx) => {
-        insertRecipeStep.run(recipeId, idx + 1, instr, 5, idx === 0 ? 1 : 0);
-      });
+      if (c.recipe.steps && c.recipe.steps.length > 0) {
+        c.recipe.steps.forEach((step, idx) => {
+          const instruction = typeof step === 'string' ? step : step.instruction;
+          const duration = typeof step === 'object' ? step.duration || 5 : 5;
+          const critical = typeof step === 'object' ? (step.critical ? 1 : 0) : idx === 0 ? 1 : 0;
+
+          insertRecipeStep.run(recipeId, idx + 1, instruction, duration, critical);
+        });
+      }
     }
   });
 }

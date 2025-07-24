@@ -31,40 +31,46 @@ export function useCocktails() {
   }, [loadCocktails]);
 
   // Buscar cócteles
-  const searchCocktails = useCallback(async (searchTerm) => {
-    if (!searchTerm || searchTerm.trim() === '') {
-      await loadCocktails();
-      return;
-    }
+  const searchCocktails = useCallback(
+    async searchTerm => {
+      if (!searchTerm || searchTerm.trim() === '') {
+        await loadCocktails();
+        return;
+      }
 
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await CocktailController.search(searchTerm);
-      setCocktails(data || []);
-    } catch (err) {
-      setError(err.message);
-      setCocktails([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [loadCocktails]);
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await CocktailController.search(searchTerm);
+        setCocktails(data || []);
+      } catch (err) {
+        setError(err.message);
+        setCocktails([]);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [loadCocktails],
+  );
 
   // Crear nuevo cóctel
-  const createCocktail = useCallback(async (cocktailData) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const result = await CocktailController.create(cocktailData);
-      await loadCocktails(); // Recargar lista después de crear
-      return result;
-    } catch (err) {
-      setError(err.message);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [loadCocktails]);
+  const createCocktail = useCallback(
+    async cocktailData => {
+      setLoading(true);
+      setError(null);
+      try {
+        const result = await CocktailController.create(cocktailData);
+        await loadCocktails(); // Recargar lista después de crear
+        return result;
+      } catch (err) {
+        setError(err.message);
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [loadCocktails],
+  );
 
   return {
     cocktails,

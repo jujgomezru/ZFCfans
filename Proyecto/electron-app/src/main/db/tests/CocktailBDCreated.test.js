@@ -11,7 +11,11 @@ import CocktailRepository from '../repositories/CocktailRepository.js';
 // Mock de la base de datos para simular almacenamiento
 const mockDb = {
   prepare: vi.fn(() => ({
-    run: vi.fn((...args) => ({ lastInsertRowid: Math.floor(Math.random() * 100) + 1, changes: 1, args })),
+    run: vi.fn((...args) => ({
+      lastInsertRowid: Math.floor(Math.random() * 100) + 1,
+      changes: 1,
+      args,
+    })),
     get: vi.fn(() => null),
     all: vi.fn(() => []),
   })),
@@ -57,7 +61,7 @@ describe('CocktailBDCreated - almacenamiento en base de datos', () => {
   test('debería rechazar cócteles sin nombre', () => {
     const cocktailData = { difficulty: 'fácil', preparation_time: 5 };
     // Simula validación en el método create
-    repository.create = (data) => {
+    repository.create = data => {
       if (!data.name || data.name.trim() === '') {
         throw new Error('Nombre requerido');
       }
@@ -84,7 +88,7 @@ describe('CocktailBDCreated - almacenamiento en base de datos', () => {
 
   test('debería rechazar cócteles con nombre duplicado (simulado)', () => {
     // Simula que el nombre ya existe
-    repository.create = (data) => {
+    repository.create = data => {
       if (data.name === 'Mojito') {
         throw new Error('Nombre duplicado');
       }

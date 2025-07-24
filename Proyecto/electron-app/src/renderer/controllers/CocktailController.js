@@ -28,7 +28,7 @@ class CocktailController {
       if (!id) {
         throw new Error('ID de cóctel es requerido');
       }
-      
+
       const result = await window.electronAPI.obtenerCoctel(id);
       if (!result.success) {
         throw new Error(result.error);
@@ -48,7 +48,7 @@ class CocktailController {
       if (!nombre || typeof nombre !== 'string') {
         throw new Error('Nombre de búsqueda es requerido');
       }
-      
+
       const result = await window.electronAPI.buscarCocteles(nombre);
       if (!result.success) {
         throw new Error(result.error);
@@ -71,7 +71,7 @@ class CocktailController {
 
       return new Promise((resolve, reject) => {
         // Listener para la respuesta
-        const handleResponse = (response) => {
+        const handleResponse = response => {
           window.electronAPI.offGuardarCoctelResp?.(handleResponse);
           if (response.success) {
             resolve(response);
@@ -82,7 +82,7 @@ class CocktailController {
 
         // Registrar listener
         window.electronAPI.onGuardarCoctelResp(handleResponse);
-        
+
         // Enviar datos
         window.electronAPI.guardarCoctel(cocktailData);
       });

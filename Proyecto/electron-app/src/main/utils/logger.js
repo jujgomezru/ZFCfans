@@ -18,7 +18,7 @@ class Logger {
   log(level, message, ...args) {
     const timestamp = new Date().toISOString();
     const prefix = `[${timestamp}] [${level}] [${this.context}]`;
-    
+
     switch (level) {
       case LOG_LEVELS.ERROR:
         console.error(prefix, message, ...args);

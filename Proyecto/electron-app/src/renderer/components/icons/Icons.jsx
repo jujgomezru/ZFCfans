@@ -184,6 +184,19 @@ export const ChevronDownIcon = ({ className = 'w-5 h-5' }) => (
   </svg>
 );
 
+export const CloseIcon = ({ className = 'w-6 h-6' }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    className={className}
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+    strokeWidth="2"
+  >
+    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+  </svg>
+);
+
 export const ClockIcon = ({ className = 'w-6 h-6' }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -215,6 +228,19 @@ export const CocktailShakerIcon = ({ className = 'w-6 h-6' }) => (
       <path d="M225 280 c-10 -11 -29 -20 -42 -20 -40 0 -60 -17 -114 -97 l-51 -75 35 -35 35 -35 75 51 c80 54 97 74 97 114 0 13 9 32 20 42 25 22 25 37 2 58 -24 22 -35 21 -57 -3z m41 -39 c-22 -21 -46 0 -26 24 10 12 16 13 27 3 12 -10 12 -13 -1 -27z m-46 -21 c22 -22 25 -46 10 -70 -8 -12 -17 -8 -51 26 -23 23 -38 47 -35 53 11 18 54 13 76 -9z m-50 -121 c-57 -48 -77 -55 -100 -34 -27 24 -25 32 16 89 l36 48 40 -38 39 -39 -31 -26z" />
       <path d="M275 133 c-9 -38 -51 -81 -86 -88 -32 -7 -40 -25 -11 -25 45 0 122 77 122 123 0 27 -17 20 -25 -10z" />
     </g>
+  </svg>
+);
+
+export const CupsIcon = ({ className = 'w-6 h-6' }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    className={className}
+    fill="currentColor"
+    stroke="currentColor"
+    viewBox="0 0 334 334"
+    xmlSpace="preserve"
+  >
+    <path d="M298.454,0H35.897c-10.34,0-18.722,8.382-18.722,18.721c0,43.123,14.479,82.991,40.769,112.257  c23.465,26.119,55.111,42.227,90.51,46.421v119.511h-30.421c-10.34,0-18.722,8.382-18.722,18.722  c0,10.339,8.382,18.721,18.722,18.721h98.285c10.34,0,18.722-8.382,18.722-18.721c0-10.34-8.382-18.722-18.722-18.722h-30.421  V177.398c35.398-4.193,67.044-20.302,90.51-46.421c26.289-29.266,40.769-69.134,40.769-112.257C317.176,8.382,308.794,0,298.454,0z" />
   </svg>
 );
 

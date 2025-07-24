@@ -1,12 +1,14 @@
 import { useNavigation } from '../context/NavigationContext';
 import { useRecipe } from '../hooks/useRecipe';
+import { CloseIcon } from '../components/icons/Icons';
 import Descripcion from '../components/resumen/Descripcion';
+import Ingredientes from '../components/resumen/Ingredientes';
 import Instructivo from '../components/resumen/Instructivo';
 
 function ResumenInformativoPage() {
   const { params, navigateTo } = useNavigation();
   const { recipeId, nombre: coctelNombre, imagen: coctelImagen } = params;
-  
+
   // Usar el hook personalizado para gestión de recetas
   const { recipe, loading, error } = useRecipe(recipeId);
 
@@ -19,7 +21,7 @@ function ResumenInformativoPage() {
           onClick={handleClose}
           className="focus-ring p-2 rounded-full hover:bg-gray-200 text-gray-600"
         >
-          ×
+          <CloseIcon className="w-5 h-5" />
         </button>
         <div className="flex justify-center items-center mt-8">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500" />
@@ -36,7 +38,7 @@ function ResumenInformativoPage() {
           onClick={handleClose}
           className="focus-ring p-2 rounded-full hover:bg-gray-200 text-gray-600"
         >
-          ×
+          <CloseIcon className="w-5 h-5" />
         </button>
         <p className="text-red-500 mt-4">Error: {error}</p>
       </div>
@@ -50,7 +52,7 @@ function ResumenInformativoPage() {
           onClick={handleClose}
           className="focus-ring p-2 rounded-full hover:bg-gray-200 text-gray-600"
         >
-          ×
+          <CloseIcon className="w-5 h-5" />
         </button>
         <p className="text-gray-500 mt-4">No se encontró la receta solicitada</p>
       </div>
@@ -65,10 +67,11 @@ function ResumenInformativoPage() {
           onClick={handleClose}
           className="focus-ring p-2 rounded-full hover:bg-gray-200 text-gray-600"
         >
-          ×
+          <CloseIcon className="w-6 h-6" />
         </button>
       </div>
-      {/* Pasa nombre e imagen desde params, datos de receta desde hook */}
+
+      {/* Información básica del cóctel */}
       <Descripcion
         name={coctelNombre || recipe.name}
         image={coctelImagen || recipe.img_url}
@@ -76,7 +79,14 @@ function ResumenInformativoPage() {
         preparationTime={recipe.preparation_time}
         glassType={recipe.glass_type}
       />
-      <Instructivo steps={recipe.pasos || recipe.steps || []} />
+
+      <div className="px-8 space-y-8">
+        {/* Lista de ingredientes */}
+        <Ingredientes ingredients={recipe.ingredients || []} />
+
+        {/* Pasos de preparación */}
+        <Instructivo steps={recipe.steps || recipe.pasos || []} />
+      </div>
     </>
   );
 }
